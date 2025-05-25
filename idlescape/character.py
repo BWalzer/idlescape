@@ -56,3 +56,13 @@ class Character(Base):
     activities: Mapped[list["CharacterActivity"]] = relationship(
         "CharacterActivity", uselist=True, back_populates="character", lazy="selectin"
     )
+
+
+class CharacterSkill(Base):
+    __tablename__ = "character_skills"
+
+    character_skill_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
+    activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
+    created_at: Mapped[datetime] = mapped_column(default=sql.func.now())
+    updated_at: Mapped[datetime] = mapped_column(default=sql.func.now())

@@ -1,4 +1,4 @@
-from idlescape.character import Character, Base, Activity, CharacterActivity
+from idlescape.character import Character, Base, CharacterSkill, Activity, CharacterActivity
 import sqlalchemy
 import sqlalchemy.orm
 import functools
@@ -38,6 +38,15 @@ class CharacterActivityData:
     ended_at: Optional[pendulum.datetime]
 
 
+@dataclass
+class CharacterSkillData:
+    character_skill_id: int
+    character_id: int
+    activity_id: int
+    created_at: pendulum.datetime
+    updated_at: pendulum.datetime
+
+
 def character_to_data(character: Character) -> CharacterData:
     return CharacterData(
         character_id=character.character_id,
@@ -59,6 +68,16 @@ def character_activity_to_data(character_activity: CharacterActivity) -> Charact
         character_id=character_activity.character_id,
         started_at=character_activity.started_at,
         ended_at=character_activity.ended_at,
+    )
+
+
+def character_skill_to_data(character_skill: CharacterSkill) -> CharacterSkillData:
+    return CharacterSkillData(
+        character_skill_id=character_skill.character_skill_id,
+        character_id=character_skill.character_id,
+        activity_id=character_skill.activity_id,
+        created_at=character_skill.created_at,
+        updated_at=character_skill.updated_at,
     )
 
 
