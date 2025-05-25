@@ -12,6 +12,9 @@ dependencies = ["click", "pendulum>=3.0.0", "sqlalchemy>=2.0.41"]
 [tool.ruff]
 line-length = 120
 
+[tool.ruff.lint]
+select = ["I"]
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
