@@ -3,11 +3,13 @@ import sqlalchemy
 from idlescape.game import Game
 import os
 
-TEST_DB_PATH = "test-idlescape.db"
+TEST_DB_PATH = "test-game.db"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def game():
+    if os.path.exists(TEST_DB_PATH):
+        os.remove(TEST_DB_PATH)
     yield Game(f"sqlite:///{TEST_DB_PATH}")
 
     if os.path.exists(TEST_DB_PATH):

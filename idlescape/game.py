@@ -73,6 +73,7 @@ class Game:
 
     @with_session
     def load_activities(self, session: sqlalchemy.orm.Session = None) -> None:
+        session.query(Activity).delete()
         with open("activities.json", "r") as f:
             activities = json.load(f)
         for activity in activities:
