@@ -11,8 +11,6 @@ def clean_cli_db():
     if os.path.exists(TEST_DB_PATH):
         os.remove(TEST_DB_PATH)
     yield
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
 
 
 @pytest.fixture(scope="function")

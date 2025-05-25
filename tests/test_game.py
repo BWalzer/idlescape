@@ -12,9 +12,6 @@ def game():
         os.remove(TEST_DB_PATH)
     yield Game(f"sqlite:///{TEST_DB_PATH}")
 
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-
 
 def test_init_db(game: Game):
     inspector = sqlalchemy.inspect(game.engine)
