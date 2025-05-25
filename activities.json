@@ -1,0 +1,17 @@
+[
+    {
+        "activity_id": 1,
+        "activity_name": "mining",
+        "activity_type": "skill"
+    },
+    {
+        "activity_id": 2,
+        "activity_name": "woodcutting",
+        "activity_type": "skill"
+    },
+    {
+        "activity_id": 3,
+        "activity_name": "fishing",
+        "activity_type": "skill"
+    }
+]
