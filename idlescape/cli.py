@@ -22,36 +22,25 @@ def create_character(character_name: str) -> None:
     click.echo(f"Created Character: {char.character_name}")
 
 
-# @cli.command(
-#     "show-character",
-#     help="Show all information of a character",
-# )
-# @click.argument("character-name")
-# def show_character(character_name: str) -> None:
-#     char = Character.get_character_by_name(character_name)
-#     if char:
-#         click.echo(char)
-#     else:
-#         click.echo(f"Could not find a character with the name '{character_name}'")
+@cli.command(
+    "show-character",
+    help="Show all information of a character",
+)
+@click.argument("character-name")
+def show_character(character_name: str) -> None:
+    char = game.get_character_by_name(character_name)
+    if char:
+        click.echo(char)
+    else:
+        click.echo(f"Could not find a character with the name '{character_name}'")
 
 
-# @cli.command(
-#     "start-activity",
-#     help="Start an activity for a character",
-# )
-# @click.argument("character_name")
-# @click.argument("activity_name")
-# def start_activity(character_name: str, activity_name: str) -> None:
-#     activity = Activity.get_activity_by_name(activity_name)
-#     char = Character.get_character_by_name(character_name)
-#     if not char:
-#         click.echo(f"Could not find a character with the name '{character_name}'")
-#         sys.exit()
-
-#     char.stop_current_activity()
-#     char.start_activity(activity)
-#     new_activity = CharacterActivity(  # noqa
-#         character_id=char.character_id,
-#         activity_id=activity.activity_id,
-#     )
-#     char.save()
+@cli.command(
+    "start-activity",
+    help="Start an activity for a character",
+)
+@click.argument("character_name")
+@click.argument("activity_name")
+def start_activity(character_name: str, activity_name: str) -> None:
+    game.start_activity(character_name=character_name, activity_name=activity_name)
+    click.echo(f"{character_name} started {activity_name}")

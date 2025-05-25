@@ -51,16 +51,8 @@ class Character(Base):
 
     character_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_name: Mapped[str] = mapped_column(unique=True)
-    created_at_utc: Mapped[datetime] = mapped_column(default=sql.func.now())
+    created_at: Mapped[datetime] = mapped_column(default=sql.func.now())
 
     activities: Mapped[list["CharacterActivity"]] = relationship(
         "CharacterActivity", uselist=True, back_populates="character", lazy="selectin"
     )
-
-    def __str__(self) -> str:
-        # TODO: Make this prettier, colors, bold, etc.
-        return f"""\
-            Name: {self.character_name}
-            Created: {self.created_at_utc}
-            Current Activity: {self.current_activity}\
-        """

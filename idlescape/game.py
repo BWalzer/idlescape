@@ -12,6 +12,14 @@ import pendulum
 class CharacterData:
     character_id: int
     character_name: str
+    created_at: pendulum.datetime
+
+    def __str__(self) -> str:
+        # TODO: Make this prettier, colors, bold, etc.
+        return f"""\
+            Name: {self.character_name}
+            Created: {self.created_at} - {self.created_at.diff_for_humans()}\
+        """
 
 
 @dataclass
@@ -31,7 +39,11 @@ class CharacterActivityData:
 
 
 def character_to_data(character: Character) -> CharacterData:
-    return CharacterData(character_id=character.character_id, character_name=character.character_name)
+    return CharacterData(
+        character_id=character.character_id,
+        character_name=character.character_name,
+        created_at=pendulum.instance(character.created_at),
+    )
 
 
 def activity_to_data(activity: Activity) -> ActivityData:

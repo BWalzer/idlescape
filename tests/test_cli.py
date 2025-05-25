@@ -15,8 +15,27 @@ def clean_cli_db():
         os.remove(TEST_DB_PATH)
 
 
-def test_create_character_cli():
-    runner = CliRunner()
+@pytest.fixture(scope="function")
+def runner():
+    return CliRunner()
+
+
+def test_create_character_cli(runner):
     result = runner.invoke(cli, ["--db-path", f"sqlite:///{TEST_DB_PATH}", "create-character", "Tobyone"])
     assert result.exit_code == 0
     assert result.output == "Created Character: Tobyone\n"
+
+
+def test_show_character_cli(runner):
+    result = runner.invoke(cli, ["--db-path", f"sqlite:///{TEST_DB_PATH}", "show-character", "Tobyone"])
+    assert result.exit_code == 0
+    assert "Name: Tobyone" in result.output
+    result = runner.invoke(cli, ["--db-path", f"sqlite:///{TEST_DB_PATH}", "show-character", "Tobytwo"])
+    assert result.exit_code == 0
+    assert result.output == "Could not find a character with the name 'Tobytwo'\n"
+
+
+def test_start_activity_cli(runner):
+    result = runner.invoke(cli, ["--db-path", f"sqlite:///{TEST_DB_PATH}", "start-activity", "Tobyone", "mining"])
+    assert result.exit_code == 0
+    assert result.output == "Tobyone started mining\n"
