@@ -44,3 +44,18 @@ def show_character(character_name: str) -> None:
 def start_activity(character_name: str, activity_name: str) -> None:
     game.start_activity(character_name=character_name, activity_name=activity_name)
     click.echo(f"{character_name} started {activity_name}")
+
+
+@cli.command("stop-activity", help="Stop the current activity for a character")
+@click.argument("character_name")
+def stop_activity(character_name: str) -> None:
+    game.stop_current_activity(character_name=character_name)
+
+
+@cli.command("list-characters", help="List all available characters")
+def list_characters() -> None:
+    characters = game.get_all_characters()
+    for character in characters:
+        click.echo(
+            f"{character.character_name} - Created {character.created_at}, {character.created_at.diff_for_humans()}"
+        )
