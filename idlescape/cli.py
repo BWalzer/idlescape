@@ -1,6 +1,6 @@
 import click
-from idlescape.game import Game
 
+from idlescape.game import Game
 
 DEFAULT_DB_PATH = "sqlite:///idlescape.db"
 

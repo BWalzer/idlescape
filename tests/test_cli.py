@@ -1,7 +1,9 @@
-from idlescape.cli import cli
-from click.testing import CliRunner
 import os
+
 import pytest
+from click.testing import CliRunner
+
+from idlescape.cli import cli
 
 TEST_DB_PATH = "test-cli.db"
 

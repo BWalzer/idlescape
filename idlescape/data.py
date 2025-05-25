@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-import pendulum
 from typing import Optional
-from idlescape.character import Character, CharacterActivity, CharacterSkill, Activity
+
+import pendulum
 import sqlalchemy.orm
+
+from idlescape.character import Activity, Character, CharacterActivity, CharacterSkill
 
 
 @dataclass

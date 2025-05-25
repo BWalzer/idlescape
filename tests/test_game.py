@@ -1,7 +1,9 @@
+import os
+
 import pytest
 import sqlalchemy
+
 from idlescape.game import Game
-import os
 
 TEST_DB_PATH = "test-game.db"
 

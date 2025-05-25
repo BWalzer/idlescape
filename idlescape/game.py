@@ -1,17 +1,19 @@
-from idlescape.character import Character, Base, CharacterSkill, Activity, CharacterActivity
+import functools
+import json
+from typing import Optional
+
+import pendulum
 import sqlalchemy
 import sqlalchemy.orm
-import functools
-from typing import Optional
-import json
-import pendulum
+
+from idlescape.character import Activity, Base, Character, CharacterActivity, CharacterSkill
 from idlescape.data import (
-    character_activity_to_data,
-    character_to_data,
+    ActivityData,
     CharacterActivityData,
     CharacterData,
     activity_to_data,
-    ActivityData,
+    character_activity_to_data,
+    character_to_data,
 )
 
 

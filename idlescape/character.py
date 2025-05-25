@@ -1,9 +1,9 @@
-from typing import Optional
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
-from sqlalchemy import ForeignKey
-from sqlalchemy import sql
 from datetime import datetime
+from typing import Optional
+
 import pendulum
+from sqlalchemy import ForeignKey, sql
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
