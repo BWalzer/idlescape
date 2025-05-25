@@ -18,7 +18,7 @@ def cli(db_path: str):
 )
 @click.argument("character-name")
 def create_character(character_name: str) -> None:
-    char = game.create_character("Tobyone")
+    char = game.create_character(character_name)
     click.echo(f"Created Character: {char.character_name}")
 
 
