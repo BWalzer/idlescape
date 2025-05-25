@@ -31,8 +31,8 @@ class CharacterActivity(Base):
     character_activity_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
     activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
-    start_time: Mapped[datetime] = mapped_column(default=sql.func.now())
-    end_time: Mapped[Optional[datetime]]
+    started_at: Mapped[datetime] = mapped_column(default=sql.func.now())
+    ended_at: Mapped[Optional[datetime]]
 
     activity: Mapped["Activity"] = relationship("Activity")
     character: Mapped["Character"] = relationship("Character", back_populates="activities")
@@ -42,7 +42,7 @@ class CharacterActivity(Base):
 
     def __str__(self) -> str:
         return f"""{self.activity.activity_name}
-            \tStart Time: {self.start_time} ({pendulum.instance(self.start_time).diff_for_humans()})\
+            \tStart Time: {self.started_at} ({pendulum.instance(self.started_at).diff_for_humans()})\
         """
 
 
