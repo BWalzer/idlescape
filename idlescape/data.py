@@ -4,7 +4,21 @@ from typing import Optional
 import pendulum
 import sqlalchemy.orm
 
-from idlescape.character import Activity, Character, CharacterActivity, CharacterSkill
+from idlescape.character import Activity, Character, CharacterActivity, CharacterItem, CharacterSkill, Item
+
+
+@dataclass
+class ItemData:
+    item_id: int
+    item_name: str
+
+
+@dataclass
+class CharacterItemData:
+    character_item_id: int
+    character_id: int
+    item_id: int
+    item: ItemData
 
 
 @dataclass
@@ -108,4 +122,18 @@ def character_skill_to_data(character_skill: CharacterSkill, session: sqlalchemy
         activity=activity_to_data(activity),
         created_at=character_skill.created_at,
         updated_at=character_skill.updated_at,
+    )
+
+
+def item_to_data(item: Item, session: sqlalchemy.orm.Session) -> ItemData:
+    return ItemData(item_id=item.item_id, item_name=item.item_name)
+
+
+def character_item_to_data(character_item: CharacterItem, session: sqlalchemy.orm.Session) -> CharacterItemData:
+    item = session.query(Item).filter_by(item_id=character_item.item_id).one()
+    return CharacterItemData(
+        character_item_id=character_item.character_item_id,
+        character_id=character_item.character_id,
+        item_id=character_item.item_id,
+        item=item_to_data(item, session),
     )

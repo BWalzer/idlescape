@@ -21,6 +21,24 @@ class Activity(Base):
         return f"{self.activity_name}"
 
 
+class Item(Base):
+    __tablename__ = "items"
+
+    item_id: Mapped[int] = mapped_column(primary_key=True)
+    item_name: Mapped[str] = mapped_column(unique=True)
+
+
+class CharacterItem(Base):
+    __tablename__ = "character_items"
+
+    character_item_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+
+    character: Mapped["Character"] = relationship("Character")
+    item: Mapped[Item] = relationship("Item")
+
+
 class CharacterActivity(Base):
     """
     Activity for a character.

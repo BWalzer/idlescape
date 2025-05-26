@@ -11,9 +11,15 @@ from idlescape.data import (
     ActivityData,
     CharacterActivityData,
     CharacterData,
+    CharacterItem,
+    CharacterItemData,
+    Item,
+    ItemData,
     activity_to_data,
     character_activity_to_data,
+    character_item_to_data,
     character_to_data,
+    item_to_data,
 )
 
 
@@ -87,6 +93,9 @@ class Game:
     def start_activity(self, character_name: str, activity_name: str, session: sqlalchemy.orm.Session = None) -> None:
         char_data = self.get_character_by_name(character_name=character_name)
         activity_data = self.get_activity_by_name(activity_name)
+        # character_activity = (
+        #     session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
+        # )
         activity = CharacterActivity(character_id=char_data.character_id, activity_id=activity_data.activity_id)
         session.add(activity)
 
