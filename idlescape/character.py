@@ -28,12 +28,24 @@ class Item(Base):
     item_name: Mapped[str] = mapped_column(unique=True)
 
 
+class ActivityAction(Base):
+    __tablename__ = "activity_actions"
+
+    activity_action_id: Mapped[int] = mapped_column(primary_key=True)
+    activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
+    action_duration: Mapped[int]
+
+
 class CharacterItem(Base):
     __tablename__ = "character_items"
 
     character_item_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+    quantity: Mapped[int]
+
+    created_at: Mapped[datetime] = mapped_column(default=sql.func.now())
+    updated_at: Mapped[datetime] = mapped_column(default=sql.func.now())
 
     character: Mapped["Character"] = relationship("Character")
     item: Mapped[Item] = relationship("Item")

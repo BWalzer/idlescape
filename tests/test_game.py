@@ -8,7 +8,7 @@ from idlescape.game import Game
 TEST_DB_PATH = "test-game.db"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def game():
     if os.path.exists(TEST_DB_PATH):
         os.remove(TEST_DB_PATH)
@@ -24,9 +24,6 @@ def test_init_db(game: Game):
 
 
 def test_create_character(game: Game):
-    """
-    Create a character. Commit. Check if sqlalchemy can find the character, and the name matches.
-    """
     game.create_character(character_name="Tobyone")
     char = game.get_character_by_name("Tobyone")
     assert char is not None
@@ -41,6 +38,7 @@ def test_get_activity_by_name(game: Game):
 
 
 def test_start_activity(game: Game):
+    game.create_character(character_name="Tobyone")
     game.start_activity(character_name="Tobyone", activity_name="mining")
     current_activity = game.get_current_activity(character_name="Tobyone")
     print(current_activity)
@@ -48,8 +46,17 @@ def test_start_activity(game: Game):
     assert current_activity.started_at is not None
     assert current_activity.ended_at is None
 
+    # Starting an activity when one is already going SHOULD end the previous activity.
+    game.start_activity(character_name="Tobyone", activity_name="woodcutting")
+    current_activity = game.get_current_activity(character_name="Tobyone")
+    assert current_activity.activity_id == 2
+    assert current_activity.started_at is not None
+    assert current_activity.ended_at is None
+
 
 def test_stop_current_activity(game: Game):
+    game.create_character(character_name="Tobyone")
+    game.start_activity(character_name="Tobyone", activity_name="mining")
     game.stop_current_activity(character_name="Tobyone")
     current_activity = game.get_current_activity(character_name="Tobyone")
     assert current_activity is None

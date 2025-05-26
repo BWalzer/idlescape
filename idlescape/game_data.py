@@ -12,6 +12,9 @@ class ItemData:
     item_id: int
     item_name: str
 
+    created_at: pendulum.DateTime
+    updated_at: pendulum.DateTime
+
 
 @dataclass
 class CharacterItemData:
@@ -136,4 +139,6 @@ def character_item_to_data(character_item: CharacterItem, session: sqlalchemy.or
         character_id=character_item.character_id,
         item_id=character_item.item_id,
         item=item_to_data(item, session),
+        created_at=pendulum.instance(character_item.created_at, tz="utc"),
+        updated_at=pendulum.instance(character_item.updated_at, tz="utc"),
     )

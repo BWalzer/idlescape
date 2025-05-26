@@ -1,0 +1,16 @@
+[
+    {
+        "activity_action_id": 1,
+        "activity_id": 1,
+        "reward_item_id": 1,
+        "action_time": 2,
+        "reward_experience": 5
+    },
+    {
+        "activity_action_id": 2,
+        "activity_id": 1,
+        "reward_item_id": 2,
+        "action_time": 1,
+        "reward_experience": 2
+    }
+]
