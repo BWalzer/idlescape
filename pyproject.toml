@@ -7,7 +7,12 @@ authors = [{ name = "Ben Walzer" }]
 license = "Apache-2.0"
 requires-python = ">=3.13"
 classifiers = []
-dependencies = ["pendulum>=3.0.0", "questionary>=2.1.0", "sqlalchemy>=2.0.41"]
+dependencies = [
+    "click>=8.2.1",
+    "pendulum>=3.0.0",
+ "questionary>=2.1.0",
+ "sqlalchemy>=2.0.41",
+]
 
 [tool.ruff]
 line-length = 120
@@ -20,7 +25,12 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-dev = ["pre-commit>=4.2.0", "pytest>=8.3.5"]
+dev = [
+    "pre-commit>=4.2.0",
+ "pytest>=8.3.5",
+ "uv>=0.7.8",
+]
+webapp = []
 
 [project.scripts]
 idlescape = "idlescape.cli:cli"
