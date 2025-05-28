@@ -16,6 +16,22 @@
         "reward_experience": 2
     },
     {
+        "activity_option_id": 5,
+        "activity_option_name": "copper",
+        "activity_id": 1,
+        "reward_item_id": 5,
+        "action_time": 1,
+        "reward_experience": 1
+    },
+    {
+        "activity_option_id": 6,
+        "activity_option_name": "tin",
+        "activity_id": 1,
+        "reward_item_id": 6,
+        "action_time": 1,
+        "reward_experience": 1
+    },
+    {
         "activity_option_id": 3,
         "activity_option_name": "tree",
         "activity_id": 2,

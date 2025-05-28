@@ -14,5 +14,13 @@
     {
         "item_id": 4,
         "item_name": "shrimp"
+    },
+    {
+        "item_id": 5,
+        "item_name": "copper"
+    },
+    {
+        "item_id": 6,
+        "item_name": "tin"
     }
 ]
