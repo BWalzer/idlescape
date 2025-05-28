@@ -109,3 +109,42 @@ def test_reward_experience_and_items(game: Game):
     assert iron_item.item.item_name == "iron"
     assert iron_item.created_at is not None
     assert iron_item.updated_at is not None
+
+
+def test_give_items(game: Game):
+    """
+    1. Create Bob
+    2. Give Bob 1 iron
+    3. Assert Bob has 1 iron
+    4. Assert Bob has 0 coal
+    """
+    bob = game.create_character("Bob")
+    game.add_item_to_character("Bob", "iron", 1)
+    bobs_iron = game.get_character_item_by_name("Bob", "iron")
+    assert bobs_iron.item.item_name == "iron"
+    assert bobs_iron.quantity == 1
+
+    bobs_coal = game.get_character_item_by_name("Bob", "coal")
+    assert bobs_coal.item.item_name == "coal"
+    assert bobs_coal.quantity == 0
+
+
+def test_give_character_skills(game: Game):
+    """
+    1. Create Bob
+    2. Give Bob level 15 mining.
+    3. Assert Bob has level 15 mining.
+    4. Assert Bob has xp.
+    5. Give Bob xp to get to level 60.
+    6. Assert that Bob has the right xp and level.
+    """
+    game.create_character("Bob")
+    game.give_character_skill_xp("Bob", "mining", 1_154)
+    bobs_mining = game.get_character_skill_by_name("Bob", "mining")
+    assert bobs_mining.experience == 1_154
+    assert bobs_mining.level == 10
+
+    game.give_character_skill_xp("Bob", "mining", 68_023 - 1_154)
+    bobs_mining = game.get_character_skill_by_name("Bob", "mining")
+    assert bobs_mining.experience == 68_023
+    assert bobs_mining.level == 60

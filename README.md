@@ -2,8 +2,12 @@
 - [x] Add character skill xp
 - [ ] Results from ending a skill
     - [x] Gain xp
-    - [ ] Add different options for actions within a skill. Differ xp gain.
-    - [ ] Obtain resources
+    - [x] Add different options for actions within a skill. Differ xp gain.
+    - [x] Obtain resources
+- [x] Add levels to skills
+- [ ] Add requirements and costs to skills
+    - Requirements: levels, items, quests (future)
+    - Costs: Items (crafting skills)
 - [ ] Refactor tests to be scenario-based
 - [ ] Handle DB errors better. This should be on the front end
 - [ ] Make `Game` independent of backend implementation (i.e., no session reference in `Game` class)

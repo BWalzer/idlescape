@@ -1,0 +1,497 @@
+[
+    {
+        "level": 1,
+        "min_xp": 0,
+        "max_xp": 82
+    },
+    {
+        "level": 2,
+        "min_xp": 83,
+        "max_xp": 173
+    },
+    {
+        "level": 3,
+        "min_xp": 174,
+        "max_xp": 275
+    },
+    {
+        "level": 4,
+        "min_xp": 276,
+        "max_xp": 387
+    },
+    {
+        "level": 5,
+        "min_xp": 388,
+        "max_xp": 511
+    },
+    {
+        "level": 6,
+        "min_xp": 512,
+        "max_xp": 649
+    },
+    {
+        "level": 7,
+        "min_xp": 650,
+        "max_xp": 800
+    },
+    {
+        "level": 8,
+        "min_xp": 801,
+        "max_xp": 968
+    },
+    {
+        "level": 9,
+        "min_xp": 969,
+        "max_xp": 1153
+    },
+    {
+        "level": 10,
+        "min_xp": 1154,
+        "max_xp": 1357
+    },
+    {
+        "level": 11,
+        "min_xp": 1358,
+        "max_xp": 1583
+    },
+    {
+        "level": 12,
+        "min_xp": 1584,
+        "max_xp": 1832
+    },
+    {
+        "level": 13,
+        "min_xp": 1833,
+        "max_xp": 2106
+    },
+    {
+        "level": 14,
+        "min_xp": 2107,
+        "max_xp": 2410
+    },
+    {
+        "level": 15,
+        "min_xp": 2411,
+        "max_xp": 2745
+    },
+    {
+        "level": 16,
+        "min_xp": 2746,
+        "max_xp": 3114
+    },
+    {
+        "level": 17,
+        "min_xp": 3115,
+        "max_xp": 3522
+    },
+    {
+        "level": 18,
+        "min_xp": 3523,
+        "max_xp": 3972
+    },
+    {
+        "level": 19,
+        "min_xp": 3973,
+        "max_xp": 4469
+    },
+    {
+        "level": 20,
+        "min_xp": 4470,
+        "max_xp": 5017
+    },
+    {
+        "level": 21,
+        "min_xp": 5018,
+        "max_xp": 5623
+    },
+    {
+        "level": 22,
+        "min_xp": 5624,
+        "max_xp": 6290
+    },
+    {
+        "level": 23,
+        "min_xp": 6291,
+        "max_xp": 7027
+    },
+    {
+        "level": 24,
+        "min_xp": 7028,
+        "max_xp": 7841
+    },
+    {
+        "level": 25,
+        "min_xp": 7842,
+        "max_xp": 8739
+    },
+    {
+        "level": 26,
+        "min_xp": 8740,
+        "max_xp": 9729
+    },
+    {
+        "level": 27,
+        "min_xp": 9730,
+        "max_xp": 10823
+    },
+    {
+        "level": 28,
+        "min_xp": 10824,
+        "max_xp": 12030
+    },
+    {
+        "level": 29,
+        "min_xp": 12031,
+        "max_xp": 13362
+    },
+    {
+        "level": 30,
+        "min_xp": 13363,
+        "max_xp": 14713
+    },
+    {
+        "level": 31,
+        "min_xp": 14714,
+        "max_xp": 16100
+    },
+    {
+        "level": 32,
+        "min_xp": 16101,
+        "max_xp": 17518
+    },
+    {
+        "level": 33,
+        "min_xp": 17519,
+        "max_xp": 18967
+    },
+    {
+        "level": 34,
+        "min_xp": 18968,
+        "max_xp": 20445
+    },
+    {
+        "level": 35,
+        "min_xp": 20446,
+        "max_xp": 21954
+    },
+    {
+        "level": 36,
+        "min_xp": 21955,
+        "max_xp": 23494
+    },
+    {
+        "level": 37,
+        "min_xp": 23495,
+        "max_xp": 25065
+    },
+    {
+        "level": 38,
+        "min_xp": 25066,
+        "max_xp": 26668
+    },
+    {
+        "level": 39,
+        "min_xp": 26669,
+        "max_xp": 28303
+    },
+    {
+        "level": 40,
+        "min_xp": 28304,
+        "max_xp": 29970
+    },
+    {
+        "level": 41,
+        "min_xp": 29971,
+        "max_xp": 31669
+    },
+    {
+        "level": 42,
+        "min_xp": 31670,
+        "max_xp": 33400
+    },
+    {
+        "level": 43,
+        "min_xp": 33401,
+        "max_xp": 35164
+    },
+    {
+        "level": 44,
+        "min_xp": 35165,
+        "max_xp": 36960
+    },
+    {
+        "level": 45,
+        "min_xp": 36961,
+        "max_xp": 38790
+    },
+    {
+        "level": 46,
+        "min_xp": 38791,
+        "max_xp": 40653
+    },
+    {
+        "level": 47,
+        "min_xp": 40654,
+        "max_xp": 42550
+    },
+    {
+        "level": 48,
+        "min_xp": 42551,
+        "max_xp": 44481
+    },
+    {
+        "level": 49,
+        "min_xp": 44482,
+        "max_xp": 46446
+    },
+    {
+        "level": 50,
+        "min_xp": 46447,
+        "max_xp": 48445
+    },
+    {
+        "level": 51,
+        "min_xp": 48446,
+        "max_xp": 50479
+    },
+    {
+        "level": 52,
+        "min_xp": 50480,
+        "max_xp": 52547
+    },
+    {
+        "level": 53,
+        "min_xp": 52548,
+        "max_xp": 54650
+    },
+    {
+        "level": 54,
+        "min_xp": 54651,
+        "max_xp": 56788
+    },
+    {
+        "level": 55,
+        "min_xp": 56789,
+        "max_xp": 58962
+    },
+    {
+        "level": 56,
+        "min_xp": 58963,
+        "max_xp": 61171
+    },
+    {
+        "level": 57,
+        "min_xp": 61172,
+        "max_xp": 63416
+    },
+    {
+        "level": 58,
+        "min_xp": 63417,
+        "max_xp": 65700
+    },
+    {
+        "level": 59,
+        "min_xp": 65701,
+        "max_xp": 68022
+    },
+    {
+        "level": 60,
+        "min_xp": 68023,
+        "max_xp": 70382
+    },
+    {
+        "level": 61,
+        "min_xp": 70383,
+        "max_xp": 72782
+    },
+    {
+        "level": 62,
+        "min_xp": 72783,
+        "max_xp": 75213
+    },
+    {
+        "level": 63,
+        "min_xp": 75214,
+        "max_xp": 77684
+    },
+    {
+        "level": 64,
+        "min_xp": 77685,
+        "max_xp": 80200
+    },
+    {
+        "level": 65,
+        "min_xp": 80201,
+        "max_xp": 82750
+    },
+    {
+        "level": 66,
+        "min_xp": 82751,
+        "max_xp": 85340
+    },
+    {
+        "level": 67,
+        "min_xp": 85341,
+        "max_xp": 87970
+    },
+    {
+        "level": 68,
+        "min_xp": 87971,
+        "max_xp": 90640
+    },
+    {
+        "level": 69,
+        "min_xp": 90641,
+        "max_xp": 93350
+    },
+    {
+        "level": 70,
+        "min_xp": 93351,
+        "max_xp": 96100
+    },
+    {
+        "level": 71,
+        "min_xp": 96101,
+        "max_xp": 98900
+    },
+    {
+        "level": 72,
+        "min_xp": 98901,
+        "max_xp": 101740
+    },
+    {
+        "level": 73,
+        "min_xp": 101741,
+        "max_xp": 104620
+    },
+    {
+        "level": 74,
+        "min_xp": 104621,
+        "max_xp": 107540
+    },
+    {
+        "level": 75,
+        "min_xp": 107541,
+        "max_xp": 110500
+    },
+    {
+        "level": 76,
+        "min_xp": 110501,
+        "max_xp": 113500
+    },
+    {
+        "level": 77,
+        "min_xp": 113501,
+        "max_xp": 116540
+    },
+    {
+        "level": 78,
+        "min_xp": 116541,
+        "max_xp": 119620
+    },
+    {
+        "level": 79,
+        "min_xp": 119621,
+        "max_xp": 122740
+    },
+    {
+        "level": 80,
+        "min_xp": 122741,
+        "max_xp": 125900
+    },
+    {
+        "level": 81,
+        "min_xp": 125901,
+        "max_xp": 129100
+    },
+    {
+        "level": 82,
+        "min_xp": 129101,
+        "max_xp": 132340
+    },
+    {
+        "level": 83,
+        "min_xp": 132341,
+        "max_xp": 135620
+    },
+    {
+        "level": 84,
+        "min_xp": 135621,
+        "max_xp": 138940
+    },
+    {
+        "level": 85,
+        "min_xp": 138941,
+        "max_xp": 142300
+    },
+    {
+        "level": 86,
+        "min_xp": 142301,
+        "max_xp": 145700
+    },
+    {
+        "level": 87,
+        "min_xp": 145701,
+        "max_xp": 149140
+    },
+    {
+        "level": 88,
+        "min_xp": 149141,
+        "max_xp": 152620
+    },
+    {
+        "level": 89,
+        "min_xp": 152621,
+        "max_xp": 156140
+    },
+    {
+        "level": 90,
+        "min_xp": 156141,
+        "max_xp": 159700
+    },
+    {
+        "level": 91,
+        "min_xp": 159701,
+        "max_xp": 163300
+    },
+    {
+        "level": 92,
+        "min_xp": 163301,
+        "max_xp": 166940
+    },
+    {
+        "level": 93,
+        "min_xp": 166941,
+        "max_xp": 170620
+    },
+    {
+        "level": 94,
+        "min_xp": 170621,
+        "max_xp": 174340
+    },
+    {
+        "level": 95,
+        "min_xp": 174341,
+        "max_xp": 178100
+    },
+    {
+        "level": 96,
+        "min_xp": 178101,
+        "max_xp": 181900
+    },
+    {
+        "level": 97,
+        "min_xp": 181901,
+        "max_xp": 185740
+    },
+    {
+        "level": 98,
+        "min_xp": 185741,
+        "max_xp": 189620
+    },
+    {
+        "level": 99,
+        "min_xp": 189621,
+        "max_xp": 193540
+    }
+]

@@ -14,6 +14,8 @@ from idlescape.game_data import (
     CharacterActivityData,
     CharacterData,
     CharacterItem,
+    CharacterItemData,
+    CharacterSkillData,
     Item,
 )
 
@@ -157,6 +159,10 @@ class Game:
             return None
         return CharacterData.from_orm(character, session)
 
+    def _get_activity_by_name(self, activity_name: str, session: sqlalchemy.orm.Session) -> Activity:
+        activity = session.query(Activity).filter_by(activity_name=activity_name).one()
+        return ActivityData.from_orm(activity)
+
     @with_session
     def get_activity_by_name(self, activity_name: str, session: sqlalchemy.orm.Session) -> ActivityData:
         """
@@ -167,8 +173,7 @@ class Game:
         Returns:
             ActivityData for the activity.
         """
-        activity = session.query(Activity).filter_by(activity_name=activity_name).one()
-        return ActivityData.from_orm(activity)
+        return ActivityData.from_orm(self._get_activity_by_name(activity_name, session))
 
     @with_session
     def start_activity(
@@ -189,10 +194,10 @@ class Game:
             None
         """
         character = self._get_character_by_name(character_name, session)
-        activity_data = self.get_activity_by_name(activity_name)
+        activity = self._get_activity_by_name(activity_name, session)
         activity_option = (
             session.query(ActivityOption)
-            .filter_by(activity_id=activity_data.activity_id, activity_option_name=activity_option_name)
+            .filter_by(activity_id=activity.activity_id, activity_option_name=activity_option_name)
             .one()
         )
         character_activity = (
@@ -202,7 +207,7 @@ class Game:
             self._stop_current_activity(character_name, session)
         activity = CharacterActivity(
             character_id=character.character_id,
-            activity_id=activity_data.activity_id,
+            activity_id=activity.activity_id,
             activity_option_id=activity_option.activity_option_id,
         )
         session.add(activity)
@@ -338,3 +343,84 @@ class Game:
         activity = session.query(Activity).filter_by(activity_name=activity_name).one()
         activity_options = session.query(ActivityOption).filter_by(activity_id=activity.activity_id).all()
         return [ActivityOptionData.from_orm(activity_option) for activity_option in activity_options]
+
+    def _get_item_by_name(self, item_name: str, session: sqlalchemy.orm.Session) -> Item:
+        return session.query(Item).filter_by(item_name=item_name).one()
+
+    def _get_character_item_by_name(
+        self, character_name: str, item_name: str, session: sqlalchemy.orm.Session
+    ) -> CharacterItem:
+        item = self._get_item_by_name(item_name, session)
+        character = self._get_character_by_name(character_name, session)
+
+        character_item = (
+            session.query(CharacterItem)
+            .filter_by(character_id=character.character_id, item_id=item.item_id)
+            .one_or_none()
+        )
+
+        # If the CharacterItem doesn't exist yet, create it, and add it to the session.
+        if not character_item:
+            character_item = CharacterItem(character_id=character.character_id, item_id=item.item_id)
+            session.add(character_item)
+
+        return character_item
+
+    @with_session
+    def get_character_item_by_name(
+        self, character_name: str, item_name: str, session: sqlalchemy.orm.Session
+    ) -> CharacterItemData:
+        return CharacterItemData.from_orm(self._get_character_item_by_name(character_name, item_name, session), session)
+
+    def _add_item_to_character(
+        self, character_name: str, item_name: str, quantity: int, session: sqlalchemy.orm.Session
+    ) -> None:
+        character_item = self._get_character_item_by_name(character_name, item_name, session)
+        character_item.quantity = quantity
+
+    @with_session
+    def add_item_to_character(
+        self, character_name: str, item_name: str, quantity: int, session: sqlalchemy.orm.Session
+    ) -> None:
+        self._add_item_to_character(character_name, item_name, quantity, session)
+
+    def _give_character_skill_xp(
+        self, character_name: str, skill_name: str, experience: int, session: sqlalchemy.orm.Session
+    ) -> None:
+        """
+        - Get the character skill
+        - Update the xp
+        """
+        character_skill = self._get_character_skill_by_name(character_name, skill_name, session)
+        character_skill.experience += experience
+        session.flush()
+
+    @with_session
+    def give_character_skill_xp(
+        self, character_name: str, skill_name: str, experience: int, session: sqlalchemy.orm.Session
+    ) -> None:
+        self._give_character_skill_xp(character_name, skill_name, experience, session)
+
+    def _get_character_skill_by_name(
+        self, character_name: str, skill_name: str, session: sqlalchemy.orm.Session
+    ) -> CharacterSkill:
+        skill = self._get_activity_by_name(activity_name=skill_name, session=session)
+        character = self._get_character_by_name(character_name, session)
+        character_skill = (
+            session.query(CharacterSkill)
+            .filter_by(character_id=character.character_id, activity_id=skill.activity_id)
+            .one_or_none()
+        )
+
+        if not character_skill:
+            character_skill = CharacterSkill(character_id=character.character_id, activity_id=skill.activity_id)
+            session.add(character_skill)
+        return character_skill
+
+    @with_session
+    def get_character_skill_by_name(
+        self, character_name: str, skill_name: str, session: sqlalchemy.orm.Session
+    ) -> CharacterSkillData:
+        return CharacterSkillData.from_orm(
+            self._get_character_skill_by_name(character_name, skill_name, session), session
+        )

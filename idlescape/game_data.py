@@ -13,6 +13,7 @@ from idlescape.character import (
     CharacterSkill,
     Item,
 )
+from idlescape.experience_to_level import xp_to_level
 
 
 @dataclass
@@ -58,7 +59,7 @@ class CharacterItemData:
         )
 
     def __str__(self) -> str:
-        return f"{self.item.item_name.title()}: {self.quantity}"
+        return f"{self.item.item_name.title()}: {self.quantity:,}"
 
 
 @dataclass
@@ -108,7 +109,11 @@ class CharacterSkillData:
     updated_at: pendulum.DateTime
 
     def __str__(self) -> str:
-        return f"{self.activity.activity_name.title()}: {self.experience}xp"
+        return f"{self.activity.activity_name.title()}: Lvl {self.level} - {self.experience:,}xp"
+
+    @property
+    def level(self) -> int:
+        return xp_to_level(self.experience)
 
     @classmethod
     def from_orm(cls, character_skill: CharacterSkill, session: sqlalchemy.orm.Session) -> "CharacterSkillData":

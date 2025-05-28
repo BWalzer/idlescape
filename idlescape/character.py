@@ -5,6 +5,8 @@ import pendulum
 from sqlalchemy import DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+from idlescape.experience_to_level import xp_to_level
+
 
 class TimestampMixin:
     """Mixin to add created_at and updated_at fields to ORM models."""
@@ -124,6 +126,10 @@ class CharacterSkill(TimestampMixin, Base):
     experience: Mapped[int] = mapped_column(default=0)
 
     character: Mapped["Character"] = relationship("Character", back_populates="skills")
+
+    @property
+    def level(self) -> int:
+        return xp_to_level(self.experience)
 
 
 def ensure_utc(dt):
