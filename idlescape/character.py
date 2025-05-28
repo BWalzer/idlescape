@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import pendulum
-from sqlalchemy import DateTime, ForeignKey, sql
+from sqlalchemy import JSON, DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from idlescape.experience_to_level import xp_to_level
@@ -47,6 +47,7 @@ class ActivityOption(TimestampMixin, Base):
     action_time: Mapped[int]
     reward_item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
     reward_experience: Mapped[int]
+    skill_requirements: Mapped[dict[str, int]] = mapped_column(JSON)
 
     activity = relationship("Activity", back_populates="options")
     reward_item = relationship("Item")

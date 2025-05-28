@@ -175,6 +175,15 @@ class Game:
         """
         return ActivityData.from_orm(self._get_activity_by_name(activity_name, session))
 
+    def _get_character_skill(
+        self, character: Character, skill: CharacterActivity, session: sqlalchemy.orm.Session
+    ) -> CharacterSkill:
+        return (
+            session.query(CharacterSkill)
+            .filter_by(character_id=character.character_id, activity_id=skill.activity_id)
+            .one()
+        )
+
     @with_session
     def start_activity(
         self,
@@ -194,12 +203,35 @@ class Game:
             None
         """
         character = self._get_character_by_name(character_name, session)
-        activity = self._get_activity_by_name(activity_name, session)
+        activity = session.query(Activity).filter_by(activity_name=activity_name).one()
         activity_option = (
             session.query(ActivityOption)
             .filter_by(activity_id=activity.activity_id, activity_option_name=activity_option_name)
             .one()
         )
+
+        # For each skill requirement, check it against the character.
+        requirements_not_met = []
+        for skill_name, level_requirement in activity_option.skill_requirements.items():
+            character_skill = self._get_character_skill(
+                character,
+                activity,
+                session,
+            )
+            if character_skill.level < level_requirement:
+                requirements_not_met.append(
+                    {
+                        "skill": skill_name.title(),
+                        "level_requirement": level_requirement,
+                        "character_skill_level": character_skill.level,
+                    }
+                )
+        if requirements_not_met:
+            template = "{skill} - Required: {level_requirement}, Character: {character_skill_level}"
+            raise ValueError(
+                f"""Cannot start {activity_name} - {activity_option_name}.
+                The following requirements aren't met: {"\n".join([template.format(**x) for x in requirements_not_met])}"""
+            )
         character_activity = (
             session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
         )

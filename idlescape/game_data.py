@@ -85,6 +85,7 @@ class ActivityOptionData:
     action_time: int
     reward_item_id: int
     reward_experience: int
+    skill_requirements: dict
 
     @classmethod
     def from_orm(cls, activity_option: ActivityOption) -> "ActivityOptionData":
@@ -95,6 +96,7 @@ class ActivityOptionData:
             action_time=activity_option.action_time,
             reward_item_id=activity_option.reward_item_id,
             reward_experience=activity_option.reward_experience,
+            skill_requirements=activity_option.skill_requirements,
         )
 
 
