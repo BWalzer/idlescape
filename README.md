@@ -2,7 +2,7 @@
 ## Game Features
 In _rough_ order of when they'll be added.
 - [x] Add character skill xp
-- [ ] Results from ending a skill
+- [] Results from ending a skill
     - [x] Gain xp
     - [x] Add different options for actions within a skill. Differ xp gain.
     - [x] Obtain resources
