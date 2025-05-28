@@ -176,7 +176,7 @@ class Game:
         return ActivityData.from_orm(self._get_activity_by_name(activity_name, session))
 
     def _get_character_skill(
-        self, character: Character, skill: CharacterActivity, session: sqlalchemy.orm.Session
+        self, character: Character, skill: Activity, session: sqlalchemy.orm.Session
     ) -> CharacterSkill:
         return (
             session.query(CharacterSkill)
@@ -191,7 +191,7 @@ class Game:
         activity_name: str,
         activity_option_name: str,
         session: sqlalchemy.orm.Session,
-    ) -> None:
+    ) -> Optional[CharacterActivityData]:
         """
         Start a new activity for a character. If an activity is already running, it is stopped first.
         Args:
@@ -203,10 +203,10 @@ class Game:
             None
         """
         character = self._get_character_by_name(character_name, session)
-        activity = session.query(Activity).filter_by(activity_name=activity_name).one()
+        new_activity = session.query(Activity).filter_by(activity_name=activity_name).one()
         activity_option = (
             session.query(ActivityOption)
-            .filter_by(activity_id=activity.activity_id, activity_option_name=activity_option_name)
+            .filter_by(activity_id=new_activity.activity_id, activity_option_name=activity_option_name)
             .one()
         )
 
@@ -215,7 +215,7 @@ class Game:
         for skill_name, level_requirement in activity_option.skill_requirements.items():
             character_skill = self._get_character_skill(
                 character,
-                activity,
+                new_activity,
                 session,
             )
             if character_skill.level < level_requirement:
@@ -227,22 +227,19 @@ class Game:
                     }
                 )
         if requirements_not_met:
-            template = "{skill} - Required: {level_requirement}, Character: {character_skill_level}"
-            raise ValueError(
-                f"""Cannot start {activity_name} - {activity_option_name}.
-                The following requirements aren't met: {"\n".join([template.format(**x) for x in requirements_not_met])}"""
-            )
+            return None
         character_activity = (
             session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
         )
         if character_activity:
             self._stop_current_activity(character_name, session)
-        activity = CharacterActivity(
+        new_character_activity = CharacterActivity(
             character_id=character.character_id,
-            activity_id=activity.activity_id,
+            activity_id=new_activity.activity_id,
             activity_option_id=activity_option.activity_option_id,
         )
-        session.add(activity)
+        session.add(new_character_activity)
+        return CharacterActivityData.from_orm(new_character_activity, session)
 
     def _stop_current_activity(self, character_name: str, session: sqlalchemy.orm.Session) -> None:
         """

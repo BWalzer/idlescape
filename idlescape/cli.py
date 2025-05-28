@@ -70,12 +70,15 @@ def cli(db_path: str):
                 "Choose an activity option", choices=activity_options, style=custom_style
             ).ask()
 
-            game.start_activity(
+            result = game.start_activity(
                 character_name=char_name,
                 activity_name=activity,
                 activity_option_name=activity_option,
             )
-            click.echo(f"{char_name} started {activity} - {activity_option}")
+            if not result:
+                click.echo(f"Couldn't start {activity} - {activity_option}. Double check the skill requirements.")
+                continue
+            click.echo(f"{char_name} started {result.activity.activity_name} - {activity_option}")
 
         elif action == "Stop Activity":
             char_names = [char.character_name for char in game.get_all_characters()]
