@@ -1,8 +1,6 @@
-# Standard library imports
 from datetime import datetime
 from typing import Optional
 
-# Third-party imports
 import pendulum
 from sqlalchemy import DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
