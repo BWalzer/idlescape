@@ -13,10 +13,5 @@
         "activity_id": 3,
         "activity_name": "fishing",
         "activity_type": "skill"
-    },
-    {
-        "activity_id": 4,
-        "activity_name": "fletching",
-        "activity_type": "skill"
     }
 ]
