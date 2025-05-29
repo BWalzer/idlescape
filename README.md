@@ -12,7 +12,7 @@ In _rough_ order of when they'll be added.
         - [x] skills
         - [ ] items
         - [ ] quests (after quests)
-    - [ ] Costs: Items (crafting skills)
+    - [x] Costs: Items (crafting skills)
 - [ ] Activity history
     - [ ] Character activity rewards (xp, items)
 - [ ] Combat

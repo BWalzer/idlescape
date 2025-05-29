@@ -368,7 +368,10 @@ class Game:
             .one()
         )
 
-        # TODO: Consume items based on actions completed
+        # Consume items based on actions completed
+        for item_cost in activity_option.item_costs:
+            chracter_item = self._get_character_item(character.character_id, item_cost["item_id"], session)
+            chracter_item.quantity -= item_cost["quantity"] * actions_completed
 
         # Reward experience
         char_skill.experience += actions_completed * activity_option.reward_experience
