@@ -82,12 +82,31 @@ class ActivityOption(TimestampMixin, Base):
     action_time: Mapped[int]
     reward_item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
     reward_experience: Mapped[int]
-    skill_requirements: Mapped[Optional[dict[str, int]]] = mapped_column(JSON)
-    item_costs: Mapped[Optional[list[dict[str, int]]]] = mapped_column(JSON, default={})
-    item_requirements: Mapped[Optional[dict[str, int]]] = mapped_column(JSON)
 
     activity = relationship("Activity", back_populates="options")
+    skill_requirements: Mapped[list["ActivityOptionSkillRequirement"]] = relationship("ActivityOptionSkillRequirement")
+    item_costs: Mapped[list["ActivityOptionItemCosts"]] = relationship("ActivityOptionItemCosts")
     reward_item = relationship("Item")
+
+
+class ActivityOptionSkillRequirement(TimestampMixin, Base):
+    __tablename__ = "activity_option_skill_requirements"
+
+    activity_option_skill_requirement_id: Mapped[int] = mapped_column(primary_key=True)
+    activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
+    skill_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
+    required_level: Mapped[int] = mapped_column(
+        CheckConstraint("required_level between 1 and 99"), default=1, server_default="1"
+    )
+
+
+class ActivityOptionItemCosts(TimestampMixin, Base):
+    __tablename__ = "activity_option_item_costs"
+
+    activity_option_item_cost_id: Mapped[int] = mapped_column(primary_key=True)
+    activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+    quantity_cost: Mapped[int] = mapped_column(CheckConstraint("quantity_cost > 0"))
 
 
 class Item(TimestampMixin, Base):
@@ -127,7 +146,7 @@ class CharacterItem(TimestampMixin, Base):
     character_item_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
-    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity >= 0"), default=0)
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity >= 0"), default=0, server_default="0")
 
     character: Mapped["Character"] = relationship("Character")
     item: Mapped[Item] = relationship("Item")

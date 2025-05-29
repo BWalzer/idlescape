@@ -7,6 +7,8 @@ import sqlalchemy.orm
 from idlescape.character import (
     Activity,
     ActivityOption,
+    ActivityOptionItemCosts,
+    ActivityOptionSkillRequirement,
     Character,
     CharacterActivity,
     CharacterItem,
@@ -14,6 +16,56 @@ from idlescape.character import (
     Item,
 )
 from idlescape.experience_to_level import xp_to_level
+
+
+@dataclass
+class ActivityOptionItemCostsData:
+    activity_option_item_cost_id: int
+    activity_option_id: int
+    item_id: int
+    quantity: int
+
+    @classmethod
+    def from_orm(cls, item_cost: ActivityOptionItemCosts) -> "ActivityOptionItemCostsData":
+        """Convert an ActivityOptionItemCosts ORM model to ActivityOptionItemCostsData.
+
+        Args:
+            item_cost (ActivityOptionItemCosts): The ORM model to convert
+
+        Returns:
+            ActivityOptionItemCostsData: A data transfer object representing the item cost
+        """
+        return cls(
+            activity_option_item_cost_id=item_cost.activity_option_item_cost_id,
+            activity_option_id=item_cost.activity_option_id,
+            item_id=item_cost.item_id,
+            quantity=item_cost.quantity,
+        )
+
+
+@dataclass
+class ActivityOptionSkillRequirementData:
+    activity_option_skill_requirement_id: int
+    activity_option_id: int
+    skill_id: int
+    required_level: int
+
+    @classmethod
+    def from_orm(cls, skill_requirement: ActivityOptionSkillRequirement) -> "ActivityOptionSkillRequirementData":
+        """Convert an ActivityOptionSkillRequirement ORM model to ActivityOptionSkillRequirementData.
+
+        Args:
+            skill_requirement (ActivityOptionSkillRequirement): The ORM model to convert
+
+        Returns:
+            ActivityOptionSkillRequirementData: A data transfer object representing the skill requirement
+        """
+        return cls(
+            activity_option_skill_requirement_id=skill_requirement.activity_option_skill_requirement_id,
+            activity_option_id=skill_requirement.activity_option_id,
+            skill_id=skill_requirement.skill_id,
+            required_level=skill_requirement.required_level,
+        )
 
 
 @dataclass
@@ -160,9 +212,6 @@ class ActivityOptionData:
         action_time (int): Time in seconds this action takes to complete
         reward_item_id (int): ID of the item received as a reward
         reward_experience (int): Experience points granted upon completion
-        skill_requirements (dict): Dictionary mapping skill names to required levels
-        item_costs(list): List of dictionaries containing items consumed for each action and quantity.
-        item_requirements(list): List of dictionaries containing items required, but not consumed.
     """
 
     activity_option_id: int
@@ -171,9 +220,6 @@ class ActivityOptionData:
     action_time: int
     reward_item_id: int
     reward_experience: int
-    skill_requirements: Optional[dict[str, int]]
-    item_costs: Optional[list[dict[str, int]]]
-    item_requirements: Optional[list[dict[str, int]]]
 
     @classmethod
     def from_orm(cls, activity_option: ActivityOption) -> "ActivityOptionData":
@@ -192,9 +238,6 @@ class ActivityOptionData:
             action_time=activity_option.action_time,
             reward_item_id=activity_option.reward_item_id,
             reward_experience=activity_option.reward_experience,
-            skill_requirements=activity_option.skill_requirements,
-            item_costs=activity_option.item_costs,
-            item_requirements=activity_option.item_requirements,
         )
 
 
