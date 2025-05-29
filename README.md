@@ -41,6 +41,9 @@ In _rough_ order of when they'll be added.
 - [ ] Discord bot
 
 ## Dev stuff
+- [ ] Refactor DTOs to better suit the application
+    - [ ] Combine ActivityOptionData with it's requirements
+    - [ ] Add items and skills to the CharacterData object
 - [ ] Testing
     - [ ] 100% code coverage
 - [ ] Handle DB errors better. This should be on the front end
