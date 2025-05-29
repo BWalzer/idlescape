@@ -9,7 +9,12 @@ from idlescape.experience_to_level import xp_to_level
 
 
 class TimestampMixin:
-    """Mixin to add created_at and updated_at fields to ORM models."""
+    """Mixin to add created_at and updated_at fields to ORM models.
+
+    Attributes:
+        created_at (datetime): UTC timestamp when the record was created
+        updated_at (datetime): UTC timestamp when the record was last updated
+    """
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=sql.func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=sql.func.now())
@@ -22,7 +27,20 @@ class Base(DeclarativeBase):
 
 
 class Activity(TimestampMixin, Base):
-    """Represents an activity type (e.g., mining, woodcutting)."""
+    """Represents an activity type in the game, such as mining or woodcutting.
+
+    An activity is a high-level category of actions that a character can perform.
+    Each activity can have multiple options (specific actions) associated with it.
+
+    Attributes:
+        activity_id (int): Unique identifier for the activity
+        activity_name (str): Unique name of the activity (e.g., "mining")
+        activity_type (str): The type of activity (affects game mechanics)
+        options (list[ActivityOption]): Related activity options for this activity
+
+    Relationships:
+        options: One-to-many relationship to ActivityOption
+    """
 
     __tablename__ = "activities"
 
@@ -37,7 +55,24 @@ class Activity(TimestampMixin, Base):
 
 
 class ActivityOption(TimestampMixin, Base):
-    """Represents a specific option for an activity (e.g., iron for mining)."""
+    """Represents a specific option for an activity, such as mining iron ore.
+
+    Activity options are the specific actions that characters can perform within
+    an activity category. Each option has its own requirements and rewards.
+
+    Attributes:
+        activity_option_id (int): Unique identifier for the activity option
+        activity_option_name (str): Unique name of the option (e.g., "iron_ore")
+        activity_id (int): Foreign key to parent Activity
+        action_time (int): Time in seconds required to complete this action
+        reward_item_id (int): Foreign key to the Item rewarded
+        reward_experience (int): Experience points awarded for completion
+        skill_requirements (dict[str, int]): Required skill levels to perform action
+
+    Relationships:
+        activity: Many-to-one relationship to Activity
+        reward_item: Many-to-one relationship to Item
+    """
 
     __tablename__ = "activity_options"
 
@@ -54,7 +89,14 @@ class ActivityOption(TimestampMixin, Base):
 
 
 class Item(TimestampMixin, Base):
-    """Represents an item in the game."""
+    """Represents an item that can be obtained in the game.
+
+    Items are rewards from activities and can be stored in a character's inventory.
+
+    Attributes:
+        item_id (int): Unique identifier for the item
+        item_name (str): Unique name of the item
+    """
 
     __tablename__ = "items"
 
@@ -63,7 +105,20 @@ class Item(TimestampMixin, Base):
 
 
 class CharacterItem(TimestampMixin, Base):
-    """Represents an item owned by a character."""
+    """Represents an item in a character's inventory.
+
+    This class tracks the quantity of each item that a character owns.
+
+    Attributes:
+        character_item_id (int): Unique identifier for this inventory entry
+        character_id (int): Foreign key to the owning Character
+        item_id (int): Foreign key to the Item
+        quantity (int): Number of this item owned by the character
+
+    Relationships:
+        character: Many-to-one relationship to Character
+        item: Many-to-one relationship to Item
+    """
 
     __tablename__ = "character_items"
 
@@ -77,7 +132,24 @@ class CharacterItem(TimestampMixin, Base):
 
 
 class CharacterActivity(TimestampMixin, Base):
-    """Represents an activity currently or previously performed by a character."""
+    """Represents an activity being performed by a character.
+
+    Tracks both current and historical activities, with start and end times.
+    A character can only have one active (unended) activity at a time.
+
+    Attributes:
+        character_activity_id (int): Unique identifier for this activity record
+        character_id (int): Foreign key to the Character performing the activity
+        activity_id (int): Foreign key to the Activity being performed
+        activity_option_id (int): Foreign key to the specific ActivityOption chosen
+        started_at (datetime): UTC timestamp when the activity was started
+        ended_at (Optional[datetime]): UTC timestamp when activity was completed, or None if ongoing
+
+    Relationships:
+        activity: Many-to-one relationship to Activity
+        activity_option: Many-to-one relationship to ActivityOption
+        character: Many-to-one relationship to Character
+    """
 
     __tablename__ = "character_activities"
 
@@ -99,7 +171,23 @@ class CharacterActivity(TimestampMixin, Base):
 
 
 class Character(TimestampMixin, Base):
-    """Represents a player character."""
+    """Represents a player character in the game.
+
+    A character can perform activities, gain experience in skills,
+    and collect items in their inventory.
+
+    Attributes:
+        character_id (int): Unique identifier for the character
+        character_name (str): Unique name of the character
+        skills (list[CharacterSkill]): Character's skills and experience levels
+        activities (list[CharacterActivity]): Current and past activities
+        items (list[CharacterItem]): Items in the character's inventory
+
+    Relationships:
+        skills: One-to-many relationship to CharacterSkill
+        activities: One-to-many relationship to CharacterActivity
+        items: One-to-many relationship to CharacterItem
+    """
 
     __tablename__ = "characters"
 
@@ -117,7 +205,23 @@ class Character(TimestampMixin, Base):
 
 
 class CharacterSkill(TimestampMixin, Base):
-    """Represents a skill and experience for a character."""
+    """Represents a character's skill level and experience in an activity.
+
+    Each character can have multiple skills, corresponding to different activities.
+    Experience points determine the level in each skill.
+
+    Attributes:
+        character_skill_id (int): Unique identifier for this skill record
+        character_id (int): Foreign key to the Character
+        activity_id (int): Foreign key to the Activity this skill relates to
+        experience (int): Total experience points earned in this skill
+
+    Relationships:
+        character: Many-to-one relationship to Character
+
+    Properties:
+        level (int): The current level based on experience points
+    """
 
     __tablename__ = "character_skills"
 
@@ -130,11 +234,29 @@ class CharacterSkill(TimestampMixin, Base):
 
     @property
     def level(self) -> int:
+        """Calculate the current level based on total experience points.
+
+        Returns:
+            int: The current level in this skill
+        """
         return xp_to_level(self.experience)
 
 
-def ensure_utc(dt):
-    """Ensure a datetime is timezone-aware in UTC."""
+def ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    """Ensure a datetime is timezone-aware in UTC.
+
+    Args:
+        dt (Optional[datetime]): The datetime to convert, or None
+
+    Returns:
+        Optional[datetime]: The datetime in UTC if provided, None if input was None
+
+    Examples:
+        >>> ensure_utc(datetime(2025, 1, 1))  # naive datetime
+        DateTime(2025, 1, 1, 0, 0, 0, tzinfo=+00:00)
+        >>> ensure_utc(None)
+        None
+    """
     if dt is None:
         return None
     if dt.tzinfo is None:

@@ -352,7 +352,9 @@ class Game:
         session.add(char_item)
 
     @with_session
-    def get_current_activity(self, character_name: str, session: sqlalchemy.orm.Session) -> CharacterActivityData:
+    def get_current_activity(
+        self, character_name: str, session: sqlalchemy.orm.Session
+    ) -> Optional[CharacterActivityData]:
         """
         Get the current activity data for a character.
         Args:
@@ -403,9 +405,7 @@ class Game:
         return [ActivityData.from_orm(activity) for activity in activities]
 
     @with_session
-    def get_all_activity_options(
-        self, activity_name: str, session: sqlalchemy.orm.Session, character_name: str = None
-    ) -> list[ActivityOptionData]:
+    def get_all_activity_options(self, activity_name: str, session: sqlalchemy.orm.Session) -> list[ActivityOptionData]:
         """
         Get all activity options for a given activity.
         Args:
