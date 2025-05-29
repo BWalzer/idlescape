@@ -189,3 +189,7 @@ cython_debug/
 
 # sqlite DB files
 *.db
+
+# Alembic
+alembic.ini
+alembic/
