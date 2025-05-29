@@ -22,5 +22,9 @@
     {
         "item_id": 6,
         "item_name": "tin"
+    },
+    {
+        "item_id": 7,
+        "item_name": "bronze bar"
     }
 ]

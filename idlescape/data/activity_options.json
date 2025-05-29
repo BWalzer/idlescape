@@ -64,5 +64,26 @@
         "skill_requirements": {
             "fishing": 1
         }
+    },
+    {
+        "activity_option_id": 7,
+        "activity_option_name": "bronze bar",
+        "activity_id": 4,
+        "reward_item_id": 7,
+        "action_time": 1,
+        "reward_experience": 10,
+        "skill_requirements": {
+            "smithing": 1
+        },
+        "item_costs": [
+            {
+                "item_id": 5,
+                "quantity": 1
+            },
+            {
+                "item_id": 6,
+                "quantity": 1
+            }
+        ]
     }
 ]

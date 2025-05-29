@@ -2,7 +2,7 @@
 ## Game Features
 In _rough_ order of when they'll be added.
 - [x] Add character skill xp
-- [] Results from ending a skill
+- [x] Results from ending a skill
     - [x] Gain xp
     - [x] Add different options for actions within a skill. Differ xp gain.
     - [x] Obtain resources
@@ -30,6 +30,10 @@ In _rough_ order of when they'll be added.
     - [ ]
 
 ## Interface
+- [ ] Add name rules
+    - Can't be empty
+    - utf-8
+    - no invisible chars
 - [ ] CLI
     - [ ] Output all handled from the CLI, not from Game
     - [ ] Prettier output formatting. Colors, bold, italics, etc.

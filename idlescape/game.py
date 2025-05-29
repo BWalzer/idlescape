@@ -247,6 +247,16 @@ class Game:
         activity = self._get_activity_by_name(activity_name, session)
         return ActivityData.from_orm(activity)
 
+    def _get_character_item(self, character_id: int, item_id: int, session: sqlalchemy.orm.Session) -> CharacterItem:
+        character_item = (
+            session.query(CharacterItem).filter_by(character_id=character_id, item_id=item_id).one_or_none()
+        )
+        if not character_item:
+            character_item = CharacterItem(character_id=character_id, item_id=item_id)
+            session.add(character_item)
+            session.flush()
+        return character_item
+
     @with_session
     def start_activity(
         self,
@@ -290,7 +300,24 @@ class Game:
                     }
                 )
         if requirements_not_met:
-            return None
+            raise ValueError(requirements_not_met)
+
+        item_costs_not_met = []
+        for item_cost in activity_option.item_costs:
+            character_item: CharacterItem = self._get_character_item(
+                character.character_id, item_cost["item_id"], session
+            )
+            if item_cost["quantity"] > character_item.quantity:
+                item_costs_not_met.append(
+                    {
+                        "item": item_cost["item_id"],
+                        "cost": item_cost["quantity"],
+                        "character_quantity": character_item.quantity,
+                    }
+                )
+        if item_costs_not_met:
+            raise ValueError(item_costs_not_met)
+
         character_activity = (
             session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
         )
@@ -320,13 +347,20 @@ class Game:
             return
         current_activity.ended_at = ended_at
 
-        # Figure out how much skill XP to give
-        # For now, give XP per second
-        # TODO: Skill xp rates
         activity_option = current_activity.activity_option
         activity_duration = ended_at.diff(ensure_utc(current_activity.started_at)).seconds
 
-        actions_completed = activity_duration // activity_option.action_time
+        # TODO: Remove workaround. Python doesn't like min of empty list, which happens when there's no item requirements.
+        if activity_option.item_costs:
+            item_cost_limits = []
+            for item_cost in activity_option.item_costs:
+                character_item = self._get_character_item(character.character_id, item_cost["item_id"], session)
+                item_cost_limits.append(character_item.quantity // item_cost["quantity"])
+            item_cost_limit = min(item_cost_limits)
+            time_limit = activity_duration // activity_option.action_time
+            actions_completed = min(item_cost_limit, time_limit)
+        else:
+            actions_completed = activity_duration // activity_option.action_time
 
         char_skill: CharacterSkill = (
             session.query(CharacterSkill)
@@ -334,8 +368,12 @@ class Game:
             .one()
         )
 
+        # TODO: Consume items based on actions completed
+
+        # Reward experience
         char_skill.experience += actions_completed * activity_option.reward_experience
 
+        # Reward items
         char_item = (
             session.query(CharacterItem)
             .filter_by(character_id=character.character_id, item_id=activity_option.reward_item_id)
@@ -347,9 +385,9 @@ class Game:
                 item_id=activity_option.reward_item_id,
                 quantity=actions_completed,
             )
+            session.add(char_item)
         else:
             char_item.quantity += actions_completed
-        session.add(char_item)
 
     @with_session
     def get_current_activity(

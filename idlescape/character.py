@@ -82,7 +82,9 @@ class ActivityOption(TimestampMixin, Base):
     action_time: Mapped[int]
     reward_item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
     reward_experience: Mapped[int]
-    skill_requirements: Mapped[dict[str, int]] = mapped_column(JSON)
+    skill_requirements: Mapped[Optional[dict[str, int]]] = mapped_column(JSON)
+    item_costs: Mapped[Optional[list[dict[str, int]]]] = mapped_column(JSON, default={})
+    item_requirements: Mapped[Optional[dict[str, int]]] = mapped_column(JSON)
 
     activity = relationship("Activity", back_populates="options")
     reward_item = relationship("Item")

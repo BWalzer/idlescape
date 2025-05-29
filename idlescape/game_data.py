@@ -161,6 +161,8 @@ class ActivityOptionData:
         reward_item_id (int): ID of the item received as a reward
         reward_experience (int): Experience points granted upon completion
         skill_requirements (dict): Dictionary mapping skill names to required levels
+        item_costs(list): List of dictionaries containing items consumed for each action and quantity.
+        item_requirements(list): List of dictionaries containing items required, but not consumed.
     """
 
     activity_option_id: int
@@ -169,7 +171,9 @@ class ActivityOptionData:
     action_time: int
     reward_item_id: int
     reward_experience: int
-    skill_requirements: dict[str, int]
+    skill_requirements: Optional[dict[str, int]]
+    item_costs: Optional[list[dict[str, int]]]
+    item_requirements: Optional[list[dict[str, int]]]
 
     @classmethod
     def from_orm(cls, activity_option: ActivityOption) -> "ActivityOptionData":
@@ -189,6 +193,8 @@ class ActivityOptionData:
             reward_item_id=activity_option.reward_item_id,
             reward_experience=activity_option.reward_experience,
             skill_requirements=activity_option.skill_requirements,
+            item_costs=activity_option.item_costs,
+            item_requirements=activity_option.item_requirements,
         )
 
 
