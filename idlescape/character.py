@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import pendulum
-from sqlalchemy import JSON, DateTime, ForeignKey, sql
+from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from idlescape.experience_to_level import xp_to_level
@@ -127,7 +127,7 @@ class CharacterItem(TimestampMixin, Base):
     character_item_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
-    quantity: Mapped[int] = mapped_column(default=0)
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity >= 0"), default=0)
 
     character: Mapped["Character"] = relationship("Character")
     item: Mapped[Item] = relationship("Item")
