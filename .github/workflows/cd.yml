@@ -44,7 +44,7 @@ jobs:
           python-version-file: "pyproject.toml"
 
       - name: Version Bump
-        run: uv bump ${{ github.event.inputs.bump_type }}
+        run: uv version --bump ${{ github.event.inputs.bump_type }}
 
       - name: Build Package
         run: uv build
