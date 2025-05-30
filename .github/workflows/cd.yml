@@ -1,0 +1,38 @@
+name: CD
+
+on:
+    push:
+        branches: [main]
+        paths: [idlescape/]
+    workflow_dispatch:
+        inputs:
+            bump_type:
+                description: "Type of version bump (patch, minor, major)"
+                required: true
+                default: "patch"
+
+jobs:
+    CD:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: astral-sh/setup-uv@v5
+
+            - uses: actions/setup-python@v5
+              with:
+                python-version-file: "pyproject.toml"
+            - name: Version Bump
+              run: uv bump ${{ github.event.inputs.bump_type }}
+
+            - name: Build idlescape
+              run: uv build
+
+            # TODO: Create a changelog
+
+            - name: Create Github release
+              uses: actions/create-release@v1
+              with:
+                tag_name: ${{ github.ref }}
+                release_name: ${{ github.ref }}
+                body: "Creating a new release!"
