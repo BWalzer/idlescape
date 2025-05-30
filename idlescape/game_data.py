@@ -18,6 +18,7 @@ from idlescape.character import (
     CharacterItem,
     CharacterSkill,
     Item,
+    ensure_utc,
 )
 from idlescape.experience_to_level import xp_to_level
 
@@ -83,7 +84,7 @@ class ActivityOptionSkillRequirementData:
 
 
 @dataclass
-class ItemData:
+class ItemData(TimestampMixinDTO):
     """Data transfer object for Item ORM model.
 
     This class provides a plain data representation of an Item,
@@ -99,16 +100,12 @@ class ItemData:
     item_id: int
     item_name: str
 
-    created_at: pendulum.DateTime
-    updated_at: pendulum.DateTime
-
     @classmethod
-    def from_orm(cls, item: Item, session: sqlalchemy.orm.Session) -> "ItemData":
+    def from_orm(cls, item: Item) -> "ItemData":
         """Convert an Item ORM model to ItemData.
 
         Args:
             item (Item): The Item ORM model to convert
-            session (sqlalchemy.orm.Session): The database session
 
         Returns:
             ItemData: A data transfer object representing the item
@@ -116,13 +113,13 @@ class ItemData:
         return cls(
             item_id=item.item_id,
             item_name=item.item_name,
-            created_at=pendulum.instance(item.created_at, tz="utc"),
-            updated_at=pendulum.instance(item.updated_at, tz="utc"),
+            created_at=item.created_at,
+            updated_at=item.updated_at,
         )
 
 
 @dataclass
-class CharacterItemData:
+class CharacterItemData(TimestampMixinDTO):
     """Data transfer object for CharacterItem ORM model.
 
     This class represents an item in a character's inventory,
@@ -134,39 +131,34 @@ class CharacterItemData:
         item_id (int): ID of the item
         item (ItemData): Details of the item
         quantity (int): Number of this item owned
-        created_at (pendulum.DateTime): UTC timestamp when the entry was created
-        updated_at (pendulum.DateTime): UTC timestamp when last updated
     """
 
     character_item_id: int
     character_id: int
     item_id: int
-    item: ItemData
     quantity: int
-
-    created_at: pendulum.DateTime
-    updated_at: pendulum.DateTime
+    character: "CharacterData"
+    item: ItemData
 
     @classmethod
-    def from_orm(cls, character_item: CharacterItem, session: sqlalchemy.orm.Session) -> "CharacterItemData":
+    def from_orm(cls, character_item: CharacterItem) -> "CharacterItemData":
         """Convert a CharacterItem ORM model to CharacterItemData.
 
         Args:
             character_item (CharacterItem): The CharacterItem ORM model to convert
-            session (sqlalchemy.orm.Session): The database session
 
         Returns:
             CharacterItemData: A data transfer object representing the inventory item
         """
-        item = session.query(Item).filter_by(item_id=character_item.item_id).one()
         return cls(
             character_item_id=character_item.character_item_id,
             character_id=character_item.character_id,
             item_id=character_item.item_id,
-            item=ItemData.from_orm(item, session),
             quantity=character_item.quantity,
-            created_at=pendulum.instance(character_item.created_at, tz="utc"),
-            updated_at=pendulum.instance(character_item.updated_at, tz="utc"),
+            character=character_item.character,
+            item=ItemData.from_orm(character_item.item),
+            created_at=character_item.created_at,
+            updated_at=character_item.updated_at,
         )
 
     def __str__(self) -> str:
@@ -179,7 +171,7 @@ class CharacterItemData:
 
 
 @dataclass
-class ActivityData:
+class ActivityData(TimestampMixinDTO):
     """Data transfer object for Activity ORM model.
 
     This class represents a type of activity that can be performed,
@@ -209,11 +201,13 @@ class ActivityData:
             activity_id=activity.activity_id,
             activity_name=activity.activity_name,
             activity_type=activity.activity_type,
+            created_at=activity.created_at,
+            updated_at=activity.updated_at,
         )
 
 
 @dataclass
-class ActivityOptionData:
+class ActivityOptionData(TimestampMixinDTO):
     """Data transfer object for ActivityOption ORM model.
 
     This class represents a specific action that can be performed within an activity,
@@ -248,11 +242,13 @@ class ActivityOptionData:
             activity_id=activity_option.activity_id,
             action_time=activity_option.action_time,
             activity=ActivityData.from_orm(activity_option.activity),
+            created_at=activity_option.created_at,
+            updated_at=activity_option.updated_at,
         )
 
 
 @dataclass
-class CharacterSkillData:
+class CharacterSkillData(TimestampMixinDTO):
     """Data transfer object for CharacterSkill ORM model.
 
     This class represents a character's progress in a particular skill,
@@ -275,9 +271,7 @@ class CharacterSkillData:
     character_id: int
     activity_id: int
     experience: int
-    activity: ActivityData
-    created_at: pendulum.DateTime
-    updated_at: pendulum.DateTime
+    skill: ActivityData
 
     def __str__(self) -> str:
         """Format the skill for display.
@@ -285,7 +279,7 @@ class CharacterSkillData:
         Returns:
             str: A string showing the skill name, level, and experience
         """
-        return f"{self.activity.activity_name.title()}: Lvl {self.level} - {self.experience:,}xp"
+        return f"{self.skill.activity_name.title()}: Lvl {self.level} - {self.experience:,}xp"
 
     @property
     def level(self) -> int:
@@ -297,30 +291,28 @@ class CharacterSkillData:
         return xp_to_level(self.experience)
 
     @classmethod
-    def from_orm(cls, character_skill: CharacterSkill, session: sqlalchemy.orm.Session) -> "CharacterSkillData":
+    def from_orm(cls, character_skill: CharacterSkill) -> "CharacterSkillData":
         """Convert a CharacterSkill ORM model to CharacterSkillData.
 
         Args:
             character_skill (CharacterSkill): The CharacterSkill ORM model to convert
-            session (sqlalchemy.orm.Session): The database session
 
         Returns:
             CharacterSkillData: A data transfer object representing the skill
         """
-        activity = session.query(Activity).filter_by(activity_id=character_skill.activity_id).one()
         return cls(
             character_skill_id=character_skill.character_skill_id,
             character_id=character_skill.character_id,
             activity_id=character_skill.activity_id,
             experience=character_skill.experience,
-            activity=ActivityData.from_orm(activity),
+            skill=ActivityData.from_orm(character_skill.skill),
             created_at=character_skill.created_at,
             updated_at=character_skill.updated_at,
         )
 
 
 @dataclass
-class CharacterActivityData:
+class CharacterActivityData(TimestampMixinDTO):
     """Data transfer object for CharacterActivity ORM model.
 
     This class represents a character's current or past activity,
@@ -340,42 +332,35 @@ class CharacterActivityData:
     activity_id: int
     character_id: int
     activity_option_id: int
+    started_at: pendulum.DateTime
     activity: ActivityData
     activity_option: ActivityOptionData
-    started_at: pendulum.DateTime
 
     @classmethod
-    def from_orm(
-        cls,
-        character_activity: CharacterActivity,
-        session: sqlalchemy.orm.Session,
-    ) -> "CharacterActivityData":
+    def from_orm(cls, character_activity: CharacterActivity) -> "CharacterActivityData":
         """Convert a CharacterActivity ORM model to CharacterActivityData.
 
         Args:
             character_activity (CharacterActivity): The CharacterActivity ORM model to convert
-            session (sqlalchemy.orm.Session): The database session
 
         Returns:
             CharacterActivityData: A data transfer object representing the activity
         """
-        activity = session.query(Activity).filter_by(activity_id=character_activity.activity_id).one()
-        activity_option = (
-            session.query(ActivityOption).filter_by(activity_option_id=character_activity.activity_option_id).one()
-        )
         return cls(
             character_activity_id=character_activity.character_activity_id,
-            activity_id=character_activity.activity_id,
-            activity=ActivityData.from_orm(activity),
-            activity_option_id=character_activity.activity_option_id,
-            activity_option=ActivityOptionData.from_orm(activity_option),
             character_id=character_activity.character_id,
-            started_at=pendulum.instance(character_activity.started_at, tz="utc"),
+            activity_id=character_activity.activity_id,
+            activity_option_id=character_activity.activity_option_id,
+            started_at=ensure_utc(character_activity.started_at),
+            activity=ActivityData.from_orm(character_activity.activity),
+            activity_option=ActivityOptionData.from_orm(character_activity.activity_option),
+            created_at=character_activity.created_at,
+            updated_at=character_activity.updated_at,
         )
 
 
 @dataclass
-class CharacterData:
+class CharacterData(TimestampMixinDTO):
     """Data transfer object for Character ORM model.
 
     This class provides a complete view of a character's state,
@@ -396,7 +381,6 @@ class CharacterData:
     activity_history: list["CharacterActivityHistoryData"]
     skills: list[CharacterSkillData]
     items: list[CharacterItemData]
-    created_at: pendulum.DateTime
 
     def __str__(self) -> str:
         """Format the character's information for display.
@@ -425,28 +409,28 @@ class CharacterData:
         """
 
     @classmethod
-    def from_orm(cls, character: Character, session: sqlalchemy.orm.Session) -> "CharacterData":
+    def from_orm(cls, character: Character) -> "CharacterData":
         """Convert a Character ORM model to CharacterData.
 
         Args:
             character (Character): The Character ORM model to convert
-            session (sqlalchemy.orm.Session): The database session
 
         Returns:
             CharacterData: A data transfer object representing the character
         """
-        current_activity = session.query(CharacterActivity).filter_by(character_id=character.character_id).one_or_none()
-        items = [CharacterItemData.from_orm(item, session) for item in character.items]
         return cls(
             character_id=character.character_id,
             character_name=character.character_name,
-            current_activity=CharacterActivityData.from_orm(current_activity, session) if current_activity else None,
+            current_activity=CharacterActivityData.from_orm(character.current_activity)
+            if character.current_activity
+            else None,
             activity_history=[
                 CharacterActivityHistoryData.from_orm(activity) for activity in character.activity_history
             ],
-            skills=[CharacterSkillData.from_orm(skill, session) for skill in character.skills],
-            items=items,
-            created_at=pendulum.instance(character.created_at, tz="utc"),
+            skills=[CharacterSkillData.from_orm(skill) for skill in character.skills],
+            items=[CharacterItemData.from_orm(item) for item in character.items],
+            created_at=character.created_at,
+            updated_at=character.updated_at,
         )
 
 

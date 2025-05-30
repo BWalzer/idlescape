@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 import pendulum
-from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKey, sql
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from idlescape.experience_to_level import xp_to_level
@@ -48,8 +48,6 @@ class Activity(TimestampMixin, Base):
     activity_id: Mapped[int] = mapped_column(primary_key=True)
     activity_name: Mapped[str] = mapped_column(unique=True)
     activity_type: Mapped[str]
-
-    options: Mapped[list["ActivityOption"]] = relationship("ActivityOption")
 
     def __str__(self) -> str:
         return f"{self.activity_name}"
@@ -231,8 +229,9 @@ class Character(TimestampMixin, Base):
     character_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_name: Mapped[str] = mapped_column(unique=True)
 
-    skills: Mapped[list["CharacterSkill"]] = relationship("CharacterSkill", uselist=True, back_populates="character")
+    skills: Mapped[list["CharacterSkill"]] = relationship("CharacterSkill", uselist=True)
     items: Mapped[list["CharacterItem"]] = relationship("CharacterItem", uselist=True, overlaps="character")
+    current_activity: Mapped[CharacterActivity] = relationship("CharacterActivity", overlaps="character")
     activity_history: Mapped[list["CharacterActivityHistory"]] = relationship("CharacterActivityHistory", uselist=True)
 
 
@@ -262,7 +261,8 @@ class CharacterSkill(TimestampMixin, Base):
     activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
     experience: Mapped[int] = mapped_column(default=0)
 
-    character: Mapped["Character"] = relationship("Character", back_populates="skills")
+    character: Mapped["Character"] = relationship("Character", overlaps="skills")
+    skill: Mapped[int] = relationship("Activity")
 
     @property
     def level(self) -> int:

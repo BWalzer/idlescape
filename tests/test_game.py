@@ -92,7 +92,7 @@ def test_reward_experience_and_items(game: Game):
     game.stop_current_activity(character_name="Alice")
     char = game.get_character_by_name("Alice")
     # Check that Alice has some experience in mining
-    mining_skill = next((s for s in char.skills if s.activity.activity_name == "mining"), None)
+    mining_skill = next((s for s in char.skills if s.skill.activity_name == "mining"), None)
     assert mining_skill is not None
     assert mining_skill.experience >= 0
     # Check that Alice has the reward item (iron)
