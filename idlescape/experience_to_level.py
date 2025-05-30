@@ -7,7 +7,6 @@ def xp_to_level(experience: int) -> int:
         xp_level_table = json.load(f)
 
     for level in reversed(xp_level_table):
-        print(f"{level=}")
         if experience >= level["min_xp"]:
             return level["level"]
     return 1
