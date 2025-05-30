@@ -1,3 +1,5 @@
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BWalzer/idlescape/main.svg)](https://results.pre-commit.ci/latest/github/BWalzer/idlescape/main)
+
 # TODO
 ## Game Features
 In _rough_ order of when they'll be added.
