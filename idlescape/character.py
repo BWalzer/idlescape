@@ -233,11 +233,9 @@ class Character(TimestampMixin, Base):
     character_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_name: Mapped[str] = mapped_column(unique=True)
 
-    skills: Mapped[list["CharacterSkill"]] = relationship(
-        "CharacterSkill", uselist=True, back_populates="character", lazy="selectin"
-    )
+    skills: Mapped[list["CharacterSkill"]] = relationship("CharacterSkill", uselist=True, back_populates="character")
     activities: Mapped[list["CharacterActivity"]] = relationship(
-        "CharacterActivity", uselist=True, back_populates="character", lazy="selectin"
+        "CharacterActivity", uselist=True, back_populates="character"
     )
 
     items: Mapped[list["CharacterItem"]] = relationship("CharacterItem", uselist=True, overlaps="character")
