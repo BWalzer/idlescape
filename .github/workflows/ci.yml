@@ -2,8 +2,10 @@ name: CI
 
 on:
   pull_request:
-        types: [opened, reopened, synchronize]
-        branches: [main]
+    types: [opened, reopened, synchronize]
+    branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   uv-example:
@@ -11,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout branch
+        uses: actions/checkout@v4
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -20,6 +23,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
+
+      - name: Build package
+        run: uv build
 
       - name: Pytest
         run: uv run pytest tests

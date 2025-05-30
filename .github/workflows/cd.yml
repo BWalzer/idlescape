@@ -1,0 +1,68 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Type of version bump (patch, minor, major)"
+        required: true
+        default: "patch"
+
+jobs:
+  Setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install Dependencies
+        run: uv install
+
+  Build:
+    needs: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Version Bump
+        run: uv bump ${{ github.event.inputs.bump_type }}
+
+      - name: Build Package
+        run: uv build
+
+      - name: Save Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist/
+
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      # TODO: Setup PyPI
+      # - name: Publish to PyPI
+      #   run: uv publish
+      #   env:
+      #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: "Automated release via GitHub Actions."
