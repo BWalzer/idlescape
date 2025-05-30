@@ -82,7 +82,7 @@ class ActivityOption(TimestampMixin, Base):
     activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
     action_time: Mapped[int]
 
-    activity = relationship("Activity", back_populates="options")
+    activity = relationship("Activity", viewonly=True)
     skill_requirements: Mapped[list["ActivityOptionSkillRequirement"]] = relationship("ActivityOptionSkillRequirement")
     item_costs: Mapped[list["ActivityOptionItemCost"]] = relationship("ActivityOptionItemCost")
     reward_items: Mapped[list["ActivityOptionItemReward"]] = relationship("ActivityOptionItemReward")
@@ -182,7 +182,6 @@ class CharacterActivity(TimestampMixin, Base):
         activity_id (int): Foreign key to the Activity being performed
         activity_option_id (int): Foreign key to the specific ActivityOption chosen
         started_at (datetime): UTC timestamp when the activity was started
-        ended_at (Optional[datetime]): UTC timestamp when activity was completed, or None if ongoing
 
     Relationships:
         activity: Many-to-one relationship to Activity
@@ -193,16 +192,15 @@ class CharacterActivity(TimestampMixin, Base):
     __tablename__ = "character_activities"
 
     character_activity_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
+    character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"), unique=True)
     activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
     activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
 
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=sql.func.now())
-    ended_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     activity: Mapped["Activity"] = relationship("Activity")
     activity_option: Mapped["ActivityOption"] = relationship("ActivityOption")
-    character: Mapped["Character"] = relationship("Character", back_populates="activities")
+    character: Mapped["Character"] = relationship("Character")
 
     def __str__(self) -> str:
         return f"""{self.activity.activity_name}\n            \tStart Time: {self.started_at} ({pendulum.instance(self.started_at).diff_for_humans()})\
@@ -234,11 +232,8 @@ class Character(TimestampMixin, Base):
     character_name: Mapped[str] = mapped_column(unique=True)
 
     skills: Mapped[list["CharacterSkill"]] = relationship("CharacterSkill", uselist=True, back_populates="character")
-    activities: Mapped[list["CharacterActivity"]] = relationship(
-        "CharacterActivity", uselist=True, back_populates="character"
-    )
-
     items: Mapped[list["CharacterItem"]] = relationship("CharacterItem", uselist=True, overlaps="character")
+    activity_history: Mapped[list["CharacterActivityHistory"]] = relationship("CharacterActivityHistory", uselist=True)
 
 
 class CharacterSkill(TimestampMixin, Base):
@@ -310,6 +305,8 @@ class CharacterActivityHistory(TimestampMixin, Base):
     started_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
     ended_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
 
+    activity_option: Mapped[ActivityOption] = relationship("ActivityOption")
+
     item_rewards: Mapped[list["CharacterActivityItemReward"]] = relationship(
         "CharacterActivityItemReward", uselist=True
     )
@@ -323,7 +320,7 @@ class CharacterActivityHistory(TimestampMixin, Base):
 
 
 class CharacterActivityItemReward(TimestampMixin, Base):
-    __tablename__ = "character_activity_item_reward"
+    __tablename__ = "character_activity_item_rewards"
 
     character_activity_item_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_activity_history_id: Mapped[int] = mapped_column(
@@ -334,7 +331,7 @@ class CharacterActivityItemReward(TimestampMixin, Base):
 
 
 class CharacterActivityExperienceReward(TimestampMixin, Base):
-    __tablename__ = "character_activity_experience_reward"
+    __tablename__ = "character_activity_experience_rewards"
 
     character_activity_experience_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     character_activity_history_id: Mapped[int] = mapped_column(

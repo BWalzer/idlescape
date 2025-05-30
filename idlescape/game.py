@@ -235,9 +235,7 @@ class Game:
         """
         if not character:
             return None
-        return (
-            session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
-        )
+        return session.query(CharacterActivity).filter_by(character_id=character.character_id).one_or_none()
 
     @with_session
     def get_character_by_name(self, character_name: str, session: sqlalchemy.orm.Session) -> CharacterData:
@@ -356,7 +354,7 @@ class Game:
             raise ValueError(item_costs_not_met)
 
         character_activity = (
-            session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
+            session.query(CharacterActivity).filter_by(character_id=character.character_id).one_or_none()
         )
         new_character_activity = CharacterActivity(
             character_id=character.character_id,
@@ -379,10 +377,10 @@ class Game:
         current_activity = self._get_current_activity(character, session)
         if not current_activity:
             return
-        current_activity.ended_at = ended_at
 
         activity_option = current_activity.activity_option
         activity_duration = ended_at.diff(ensure_utc(current_activity.started_at)).seconds
+        session.delete(current_activity)
 
         # TODO: Remove workaround. Python doesn't like min of empty list, which happens when there's no item requirements.
         if activity_option.item_costs:
@@ -406,7 +404,7 @@ class Game:
             character_id=character.character_id,
             activity_option_id=activity_option.activity_option_id,
             started_at=current_activity.started_at,
-            ended_at=current_activity.ended_at,
+            ended_at=ended_at,
         )
 
         # Consume items based on actions completed
@@ -419,6 +417,7 @@ class Game:
                     quantity=item_cost.quantity,
                 )
             )
+
             chracter_item.quantity -= item_cost.quantity * actions_completed
 
         # Reward experience
@@ -437,6 +436,8 @@ class Game:
         for reward_item in activity_option.reward_items:
             character_item = self._get_character_item(character.character_id, reward_item.item_id, session)
             character_item.quantity += reward_item.quantity * actions_completed
+
+        session.add(character_activity_history)
 
     @with_session
     def get_current_activity(

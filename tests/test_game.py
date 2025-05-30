@@ -44,7 +44,6 @@ def test_start_activity(game: Game):
     print(current_activity)
     assert current_activity.activity_id == 1
     assert current_activity.started_at is not None
-    assert current_activity.ended_at is None
 
     # Starting an activity when one is already going SHOULD end the previous activity.
     game.start_activity(character_name="Tobyone", activity_name="woodcutting", activity_option_name="tree")
@@ -52,7 +51,6 @@ def test_start_activity(game: Game):
     assert current_activity.activity_id == 2
     assert current_activity.activity_option_id == 3
     assert current_activity.started_at is not None
-    assert current_activity.ended_at is None
 
 
 def test_stop_current_activity(game: Game):

@@ -230,6 +230,7 @@ class ActivityOptionData:
     activity_option_name: str
     activity_id: int
     action_time: int
+    activity: ActivityData
 
     @classmethod
     def from_orm(cls, activity_option: ActivityOption) -> "ActivityOptionData":
@@ -246,6 +247,7 @@ class ActivityOptionData:
             activity_option_name=activity_option.activity_option_name,
             activity_id=activity_option.activity_id,
             action_time=activity_option.action_time,
+            activity=ActivityData.from_orm(activity_option.activity),
         )
 
 
@@ -332,7 +334,6 @@ class CharacterActivityData:
         activity (ActivityData): Details of the activity being performed
         activity_option (ActivityOptionData): Details of the specific action
         started_at (pendulum.DateTime): UTC timestamp when the activity was started
-        ended_at (Optional[pendulum.DateTime]): UTC timestamp when completed, or None if ongoing
     """
 
     character_activity_id: int
@@ -342,7 +343,6 @@ class CharacterActivityData:
     activity: ActivityData
     activity_option: ActivityOptionData
     started_at: pendulum.DateTime
-    ended_at: Optional[pendulum.DateTime]
 
     @classmethod
     def from_orm(
@@ -371,7 +371,6 @@ class CharacterActivityData:
             activity_option=ActivityOptionData.from_orm(activity_option),
             character_id=character_activity.character_id,
             started_at=pendulum.instance(character_activity.started_at, tz="utc"),
-            ended_at=pendulum.instance(character_activity.ended_at, tz="utc") if character_activity.ended_at else None,
         )
 
 
@@ -394,6 +393,7 @@ class CharacterData:
     character_id: int
     character_name: str
     current_activity: Optional[CharacterActivityData]
+    activity_history: list["CharacterActivityHistoryData"]
     skills: list[CharacterSkillData]
     items: list[CharacterItemData]
     created_at: pendulum.DateTime
@@ -420,6 +420,8 @@ class CharacterData:
                 {"\n\t\t".join([str(skill) for skill in self.skills])}
             Items:
                 {"\n\t\t".join([str(item) for item in self.items])}
+            Activity History:
+                {"\n\t\t".join([str(activity) for activity in self.activity_history])}
         """
 
     @classmethod
@@ -433,14 +435,15 @@ class CharacterData:
         Returns:
             CharacterData: A data transfer object representing the character
         """
-        current_activity = (
-            session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
-        )
+        current_activity = session.query(CharacterActivity).filter_by(character_id=character.character_id).one_or_none()
         items = [CharacterItemData.from_orm(item, session) for item in character.items]
         return cls(
             character_id=character.character_id,
             character_name=character.character_name,
             current_activity=CharacterActivityData.from_orm(current_activity, session) if current_activity else None,
+            activity_history=[
+                CharacterActivityHistoryData.from_orm(activity) for activity in character.activity_history
+            ],
             skills=[CharacterSkillData.from_orm(skill, session) for skill in character.skills],
             items=items,
             created_at=pendulum.instance(character.created_at, tz="utc"),
@@ -481,7 +484,7 @@ class CharacterActivityExperienceRewardData(TimestampMixinDTO):
             character_activity_experience_reward_id=character_activity_experience_reward.character_activity_experience_reward_id,
             character_activity_history_id=character_activity_experience_reward.character_activity_history_id,
             skill_id=character_activity_experience_reward.skill_id,
-            reward_experience=character_activity_experience_reward.reward_experience,
+            reward_experience=character_activity_experience_reward.experience,
             created_at=character_activity_experience_reward.created_at,
             updated_at=character_activity_experience_reward.updated_at,
         )
@@ -511,6 +514,7 @@ class CharacterActivityHistoryData(TimestampMixinDTO):
     activity_option_id: int
     started_at: pendulum.DateTime
     ended_at: pendulum.DateTime
+    activity_option: ActivityOptionData
 
     item_rewards: list[CharacterActivityItemRewardData]
     experience_rewards: list[CharacterActivityExperienceRewardData]
@@ -524,6 +528,7 @@ class CharacterActivityHistoryData(TimestampMixinDTO):
             activity_option_id=character_activity_history.activity_option_id,
             started_at=pendulum.instance(character_activity_history.started_at, tz="utc"),
             ended_at=pendulum.instance(character_activity_history.ended_at, tz="utc"),
+            activity_option=ActivityOptionData.from_orm(character_activity_history.activity_option),
             item_rewards=[
                 CharacterActivityItemRewardData.from_orm(item_reward)
                 for item_reward in character_activity_history.item_rewards
@@ -538,3 +543,6 @@ class CharacterActivityHistoryData(TimestampMixinDTO):
             created_at=character_activity_history.created_at,
             updated_at=character_activity_history.updated_at,
         )
+
+    def __str__(self) -> str:
+        return f"{self.activity_option.activity.activity_name.title()} - {self.activity_option.activity_option_name}: Started - {self.started_at}, Ended - {self.ended_at}, Duration: {self.started_at.diff_for_humans(self.ended_at, absolute=True)}"
