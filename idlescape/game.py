@@ -1,4 +1,5 @@
 import functools
+import importlib.resources
 import json
 from typing import Optional
 
@@ -82,7 +83,7 @@ class Game:
         from idlescape.character import ActivityOptionItemReward
 
         session.query(ActivityOptionItemReward).delete()
-        with open("idlescape/data/activity_option_item_rewards.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activity_option_item_rewards.json") as f:
             item_rewards: list[dict[str, int]] = json.load(f)
         session.add_all([ActivityOptionItemReward(**item_reward) for item_reward in item_rewards])
 
@@ -90,66 +91,41 @@ class Game:
         from idlescape.character import ActivityOptionExperienceReward
 
         session.query(ActivityOptionExperienceReward).delete()
-        with open("idlescape/data/activity_option_experience_rewards.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activity_option_experience_rewards.json") as f:
             xp_rewards: list[dict[str, int]] = json.load(f)
         session.add_all([ActivityOptionExperienceReward(**xp_reward) for xp_reward in xp_rewards])
 
     def _load_skill_requirements(self, session: sqlalchemy.orm.Session) -> None:
-        """Load skill requirements from JSON into the database.
-
-        Args:
-            session: SQLAlchemy session.
-        """
         from idlescape.game_data import ActivityOptionSkillRequirement
 
         session.query(ActivityOptionSkillRequirement).delete()
-        with open("idlescape/data/activity_option_skill_requirements.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activity_option_skill_requirements.json") as f:
             skill_requirements: list[dict] = json.load(f)
         session.add_all([ActivityOptionSkillRequirement(**requirement) for requirement in skill_requirements])
 
     def _load_item_costs(self, session: sqlalchemy.orm.Session) -> None:
-        """Load item costs from JSON into the database.
-
-        Args:
-            session: SQLAlchemy session.
-        """
         from idlescape.game_data import ActivityOptionItemCost
 
         session.query(ActivityOptionItemCost).delete()
-        with open("idlescape/data/activity_option_item_costs.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activity_option_item_costs.json") as f:
             item_costs: list[dict] = json.load(f)
         session.add_all([ActivityOptionItemCost(**cost) for cost in item_costs])
 
     def _load_activity_options(self, session: sqlalchemy.orm.Session) -> None:
-        """Load activity options from JSON into the database.
-
-        Args:
-            session: SQLAlchemy session.
-        """
         session.query(ActivityOption).delete()
-        with open("idlescape/data/activity_options.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activity_options.json") as f:
             activity_options: list[dict] = json.load(f)
         session.add_all([ActivityOption(**activity_option) for activity_option in activity_options])
 
     def _load_items(self, session: sqlalchemy.orm.Session) -> None:
-        """Load items from JSON into the database.
-
-        Args:
-            session: SQLAlchemy session.
-        """
         session.query(Item).delete()
-        with open("idlescape/data/items.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "items.json") as f:
             items: list[dict] = json.load(f)
         session.add_all([Item(**item) for item in items])
 
     def _load_activities(self, session: sqlalchemy.orm.Session) -> None:
-        """Load activities from JSON into the database.
-
-        Args:
-            session: SQLAlchemy session.
-        """
         session.query(Activity).delete()
-        with open("idlescape/data/activities.json", "r") as f:
+        with importlib.resources.open_text("idlescape.data", "activities.json") as f:
             activities: list[dict] = json.load(f)
         session.add_all([Activity(**activity) for activity in activities])
 

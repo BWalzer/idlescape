@@ -22,15 +22,17 @@ line-length = 120
 select = ["I"]
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools_scm]
+
+
 [dependency-groups]
-dev = [
-    "pre-commit>=4.2.0",
- "pytest>=8.3.5",
- "uv>=0.7.8",
-]
+dev = ["pre-commit>=4.2.0", "pytest>=8.3.5", "uv>=0.7.8"]
 webapp = []
 
 [project.scripts]
