@@ -46,7 +46,7 @@ In _rough_ order of when they'll be added.
 - [x] Clean up ORM classes and DTOs. DTOs shouldn't need the session, make the relationship in the ORM.
 - [ ] Refactor DTOs to better suit the application
     - [ ] Combine ActivityOptionData with it's requirements
-    - [ ] Add items and skills to the CharacterData object
+    - [x] Add items and skills to the CharacterData object
 - [ ] Testing
     - [ ] 100% code coverage
 - [ ] Handle DB errors better. This should be on the front end
