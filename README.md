@@ -11,7 +11,6 @@ In _rough_ order of when they'll be added.
     - [ ] Requirements
         - [x] skills
         - [x] items
-        - [ ] quests (after quests)
     - [x] Costs: Items (crafting skills)
 - [ ] Activity history
     - [x] Rewarded items
@@ -27,9 +26,13 @@ In _rough_ order of when they'll be added.
     - [ ] Enemy drops
     - [ ] DEATH
 - [ ] Quests
+    - [ ] Add quests to activity requirements
 - [ ] Skill improvements
     - [ ] Tools boost action rate
     - [ ] Levels boost action rate
+    - **more skills**
+        - [ ] fletching
+
 
 ## Interface
 - [ ] Add name rules

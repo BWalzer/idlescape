@@ -1,6 +1,6 @@
 [project]
 name = "idlescape"
-version = "0.1"
+version = "0.2"
 description = "An idle game. Collect resources, level up skills."
 readme = "README.md"
 authors = [{ name = "Ben Walzer" }]
