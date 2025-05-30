@@ -7,10 +7,14 @@ import sqlalchemy.orm
 from idlescape.character import (
     Activity,
     ActivityOption,
-    ActivityOptionItemCosts,
+    ActivityOptionItemCost,
     ActivityOptionSkillRequirement,
     Character,
     CharacterActivity,
+    CharacterActivityExperienceReward,
+    CharacterActivityHistory,
+    CharacterActivityItemCost,
+    CharacterActivityItemReward,
     CharacterItem,
     CharacterSkill,
     Item,
@@ -19,21 +23,31 @@ from idlescape.experience_to_level import xp_to_level
 
 
 @dataclass
-class ActivityOptionItemCostsData:
+class TimestampMixinDTO:
+    created_at: pendulum.DateTime
+    updated_at: pendulum.DateTime
+
+    def __post_init__(self):
+        self.created_at = pendulum.instance(self.created_at, tz="utc")
+        self.updated_at = pendulum.instance(self.updated_at, tz="utc")
+
+
+@dataclass
+class ActivityOptionItemCostData:
     activity_option_item_cost_id: int
     activity_option_id: int
     item_id: int
     quantity: int
 
     @classmethod
-    def from_orm(cls, item_cost: ActivityOptionItemCosts) -> "ActivityOptionItemCostsData":
-        """Convert an ActivityOptionItemCosts ORM model to ActivityOptionItemCostsData.
+    def from_orm(cls, item_cost: ActivityOptionItemCost) -> "ActivityOptionItemCostData":
+        """Convert an ActivityOptionItemCost ORM model to ActivityOptionItemCostData.
 
         Args:
-            item_cost (ActivityOptionItemCosts): The ORM model to convert
+            item_cost (ActivityOptionItemCost): The ORM model to convert
 
         Returns:
-            ActivityOptionItemCostsData: A data transfer object representing the item cost
+            ActivityOptionItemCostData: A data transfer object representing the item cost
         """
         return cls(
             activity_option_item_cost_id=item_cost.activity_option_item_cost_id,
@@ -210,16 +224,12 @@ class ActivityOptionData:
         activity_option_name (str): Name of the specific action (e.g., "iron")
         activity_id (int): ID of the parent activity
         action_time (int): Time in seconds this action takes to complete
-        reward_item_id (int): ID of the item received as a reward
-        reward_experience (int): Experience points granted upon completion
     """
 
     activity_option_id: int
     activity_option_name: str
     activity_id: int
     action_time: int
-    reward_item_id: int
-    reward_experience: int
 
     @classmethod
     def from_orm(cls, activity_option: ActivityOption) -> "ActivityOptionData":
@@ -236,8 +246,6 @@ class ActivityOptionData:
             activity_option_name=activity_option.activity_option_name,
             activity_id=activity_option.activity_id,
             action_time=activity_option.action_time,
-            reward_item_id=activity_option.reward_item_id,
-            reward_experience=activity_option.reward_experience,
         )
 
 
@@ -436,4 +444,97 @@ class CharacterData:
             skills=[CharacterSkillData.from_orm(skill, session) for skill in character.skills],
             items=items,
             created_at=pendulum.instance(character.created_at, tz="utc"),
+        )
+
+
+@dataclass
+class CharacterActivityItemRewardData(TimestampMixinDTO):
+    character_activity_item_reward_id: int
+    character_activity_history_id: int
+    item_id: int
+    quantity: int
+
+    @classmethod
+    def from_orm(cls, character_activity_item_reward: CharacterActivityItemReward) -> "CharacterActivityItemReward":
+        return cls(
+            character_activity_item_reward_id=character_activity_item_reward.character_activity_item_reward_id,
+            character_activity_history_id=character_activity_item_reward.character_activity_history_id,
+            item_id=character_activity_item_reward.item_id,
+            quantity=character_activity_item_reward.quantity,
+            created_at=character_activity_item_reward.created_at,
+            updated_at=character_activity_item_reward.updated_at,
+        )
+
+
+@dataclass
+class CharacterActivityExperienceRewardData(TimestampMixinDTO):
+    character_activity_experience_reward_id: int
+    character_activity_history_id: int
+    skill_id: int
+    reward_experience: int
+
+    @classmethod
+    def from_orm(
+        cls, character_activity_experience_reward: CharacterActivityExperienceReward
+    ) -> "CharacterActivityExperienceRewardData":
+        return cls(
+            character_activity_experience_reward_id=character_activity_experience_reward.character_activity_experience_reward_id,
+            character_activity_history_id=character_activity_experience_reward.character_activity_history_id,
+            skill_id=character_activity_experience_reward.skill_id,
+            reward_experience=character_activity_experience_reward.reward_experience,
+            created_at=character_activity_experience_reward.created_at,
+            updated_at=character_activity_experience_reward.updated_at,
+        )
+
+
+@dataclass
+class CharacterActivityItemCostData(TimestampMixinDTO):
+    character_activity_item_cost_id: int
+    character_activity_history_id: int
+    item_id: int
+    quantity: int
+
+    @classmethod
+    def from_orm(cls, character_activity_item_cost: CharacterActivityItemCost) -> "CharacterActivityItemCostData":
+        return cls(
+            character_activity_item_cost_id=character_activity_item_cost.character_activity_item_cost_id,
+            character_activity_history_id=character_activity_item_cost.characte_activity_history_id,
+            item_id=character_activity_item_cost.item_id,
+            quantity=character_activity_item_cost.quantity,
+        )
+
+
+@dataclass
+class CharacterActivityHistoryData(TimestampMixinDTO):
+    character_activity_history_id: int
+    character_id: int
+    activity_option_id: int
+    started_at: pendulum.DateTime
+    ended_at: pendulum.DateTime
+
+    item_rewards: list[CharacterActivityItemRewardData]
+    experience_rewards: list[CharacterActivityExperienceRewardData]
+    item_costs: list[CharacterActivityItemCostData]
+
+    @classmethod
+    def from_orm(cls, character_activity_history: CharacterActivityHistory) -> "CharacterActivityHistoryData":
+        return cls(
+            character_activity_history_id=character_activity_history.character_activity_history_id,
+            character_id=character_activity_history.character_id,
+            activity_option_id=character_activity_history.activity_option_id,
+            started_at=pendulum.instance(character_activity_history.started_at, tz="utc"),
+            ended_at=pendulum.instance(character_activity_history.ended_at, tz="utc"),
+            item_rewards=[
+                CharacterActivityItemRewardData.from_orm(item_reward)
+                for item_reward in character_activity_history.item_rewards
+            ],
+            experience_rewards=[
+                CharacterActivityExperienceRewardData.from_orm(xp_reward)
+                for xp_reward in character_activity_history.experience_rewards
+            ],
+            item_costs=[
+                CharacterActivityItemCostData.from_orm(item_cost) for item_cost in character_activity_history.item_costs
+            ],
+            created_at=character_activity_history.created_at,
+            updated_at=character_activity_history.updated_at,
         )

@@ -6,7 +6,17 @@ import pendulum
 import sqlalchemy
 import sqlalchemy.orm
 
-from idlescape.character import Activity, Base, Character, CharacterActivity, CharacterSkill, ensure_utc
+from idlescape.character import (
+    Activity,
+    Base,
+    Character,
+    CharacterActivity,
+    CharacterActivityExperienceReward,
+    CharacterActivityHistory,
+    CharacterActivityItemCost,
+    CharacterSkill,
+    ensure_utc,
+)
 from idlescape.game_data import (
     ActivityData,
     ActivityOption,
@@ -63,7 +73,25 @@ class Game:
             self._load_activity_options(session)
             self._load_skill_requirements(session)
             self._load_item_costs(session)
+            self._load_item_rewards(session)
+            self._load_experience_rewards(session)
             session.commit()
+
+    def _load_item_rewards(self, session: sqlalchemy.orm.Session) -> None:
+        from idlescape.character import ActivityOptionItemReward
+
+        session.query(ActivityOptionItemReward).delete()
+        with open("idlescape/data/activity_option_item_rewards.json", "r") as f:
+            item_rewards: list[dict[str, int]] = json.load(f)
+        session.add_all([ActivityOptionItemReward(**item_reward) for item_reward in item_rewards])
+
+    def _load_experience_rewards(self, session: sqlalchemy.orm.Session) -> None:
+        from idlescape.character import ActivityOptionExperienceReward
+
+        session.query(ActivityOptionExperienceReward).delete()
+        with open("idlescape/data/activity_option_experience_rewards.json", "r") as f:
+            xp_rewards: list[dict[str, int]] = json.load(f)
+        session.add_all([ActivityOptionExperienceReward(**xp_reward) for xp_reward in xp_rewards])
 
     def _load_skill_requirements(self, session: sqlalchemy.orm.Session) -> None:
         """Load skill requirements from JSON into the database.
@@ -84,12 +112,12 @@ class Game:
         Args:
             session: SQLAlchemy session.
         """
-        from idlescape.game_data import ActivityOptionItemCosts
+        from idlescape.game_data import ActivityOptionItemCost
 
-        session.query(ActivityOptionItemCosts).delete()
+        session.query(ActivityOptionItemCost).delete()
         with open("idlescape/data/activity_option_item_costs.json", "r") as f:
             item_costs: list[dict] = json.load(f)
-        session.add_all([ActivityOptionItemCosts(**cost) for cost in item_costs])
+        session.add_all([ActivityOptionItemCost(**cost) for cost in item_costs])
 
     def _load_activity_options(self, session: sqlalchemy.orm.Session) -> None:
         """Load activity options from JSON into the database.
@@ -101,8 +129,6 @@ class Game:
         with open("idlescape/data/activity_options.json", "r") as f:
             activity_options: list[dict] = json.load(f)
         session.add_all([ActivityOption(**activity_option) for activity_option in activity_options])
-
-        # Load skill requirements and item costs
 
     def _load_items(self, session: sqlalchemy.orm.Session) -> None:
         """Load items from JSON into the database.
@@ -196,7 +222,7 @@ class Game:
         )
 
     def _get_current_activity(
-        self, character_name: str, session: sqlalchemy.orm.Session
+        self, character: Character, session: sqlalchemy.orm.Session
     ) -> Optional[CharacterActivity]:
         """Get the current activity ORM object for a character.
 
@@ -207,7 +233,6 @@ class Game:
         Returns:
             CharacterActivity ORM object or None if no current activity.
         """
-        character = self._get_character_by_name(character_name, session)
         if not character:
             return None
         return (
@@ -287,6 +312,9 @@ class Game:
             None
         """
         character = self._get_character_by_name(character_name, session)
+        current_activity = self._get_current_activity(character, session)
+        if current_activity:
+            self._stop_current_activity(character, session)
         new_activity = session.query(Activity).filter_by(activity_name=activity_name).one()
         activity_option: ActivityOption = (
             session.query(ActivityOption)
@@ -316,11 +344,11 @@ class Game:
         item_costs_not_met = []
         for item_cost in activity_option.item_costs:
             character_item: CharacterItem = self._get_character_item(character.character_id, item_cost.item_id, session)
-            if item_cost.quantity_cost > character_item.quantity:
+            if item_cost.quantity > character_item.quantity:
                 item_costs_not_met.append(
                     {
                         "item": item_cost.item_id,
-                        "cost": item_cost.quantity_cost,
+                        "cost": item_cost.quantity,
                         "character_quantity": character_item.quantity,
                     }
                 )
@@ -330,8 +358,6 @@ class Game:
         character_activity = (
             session.query(CharacterActivity).filter_by(character_id=character.character_id, ended_at=None).one_or_none()
         )
-        if character_activity:
-            self._stop_current_activity(character_name, session)
         new_character_activity = CharacterActivity(
             character_id=character.character_id,
             activity_id=new_activity.activity_id,
@@ -340,7 +366,7 @@ class Game:
         session.add(new_character_activity)
         return CharacterActivityData.from_orm(new_character_activity, session)
 
-    def _stop_current_activity(self, character_name: str, session: sqlalchemy.orm.Session) -> None:
+    def _stop_current_activity(self, character: Character, session: sqlalchemy.orm.Session) -> None:
         """
         Stop the current activity for a character, reward XP and items.
         Args:
@@ -349,9 +375,8 @@ class Game:
         Returns:
             None
         """
-        character = self._get_character_by_name(character_name, session)
         ended_at = pendulum.now("utc")
-        current_activity = self._get_current_activity(character_name, session)
+        current_activity = self._get_current_activity(character, session)
         if not current_activity:
             return
         current_activity.ended_at = ended_at
@@ -364,7 +389,7 @@ class Game:
             item_cost_limits = []
             for item_cost in activity_option.item_costs:
                 character_item = self._get_character_item(character.character_id, item_cost.item_id, session)
-                item_cost_limits.append(character_item.quantity // item_cost.quantity_cost)
+                item_cost_limits.append(character_item.quantity // item_cost.quantity)
             item_cost_limit = min(item_cost_limits)
             time_limit = activity_duration // activity_option.action_time
             actions_completed = min(item_cost_limit, time_limit)
@@ -377,29 +402,41 @@ class Game:
             .one()
         )
 
+        character_activity_history = CharacterActivityHistory(
+            character_id=character.character_id,
+            activity_option_id=activity_option.activity_option_id,
+            started_at=current_activity.started_at,
+            ended_at=current_activity.ended_at,
+        )
+
         # Consume items based on actions completed
         for item_cost in activity_option.item_costs:
             chracter_item = self._get_character_item(character.character_id, item_cost.item_id, session)
-            chracter_item.quantity -= item_cost.quantity_cost * actions_completed
+            character_activity_history.item_costs.append(
+                CharacterActivityItemCost(
+                    character_activity_history_id=character_activity_history.character_activity_history_id,
+                    item_id=item_cost.item_id,
+                    quantity=item_cost.quantity,
+                )
+            )
+            chracter_item.quantity -= item_cost.quantity * actions_completed
 
         # Reward experience
-        char_skill.experience += actions_completed * activity_option.reward_experience
+        for reward_experience in activity_option.reward_experience:
+            char_skill.experience += actions_completed * reward_experience.experience
+            character_activity_history.experience_rewards.append(
+                CharacterActivityExperienceReward(
+                    character_activity_history_id=character_activity_history.character_activity_history_id,
+                    skill_id=reward_experience.skill_id,
+                    experience=reward_experience.experience,
+                )
+            )
 
         # Reward items
-        char_item = (
-            session.query(CharacterItem)
-            .filter_by(character_id=character.character_id, item_id=activity_option.reward_item_id)
-            .one_or_none()
-        )
-        if not char_item:
-            char_item = CharacterItem(
-                character_id=character.character_id,
-                item_id=activity_option.reward_item_id,
-                quantity=actions_completed,
-            )
-            session.add(char_item)
-        else:
-            char_item.quantity += actions_completed
+        # For each item, give it to the character.
+        for reward_item in activity_option.reward_items:
+            character_item = self._get_character_item(character.character_id, reward_item.item_id, session)
+            character_item.quantity += reward_item.quantity * actions_completed
 
     @with_session
     def get_current_activity(
@@ -413,7 +450,8 @@ class Game:
         Returns:
             CharacterActivityData or None if not found.
         """
-        current_activity = self._get_current_activity(character_name, session)
+        character = self._get_character_by_name(character_name, session)
+        current_activity = self._get_current_activity(character, session)
         if not current_activity:
             return None
         return CharacterActivityData.from_orm(current_activity, session)
@@ -428,7 +466,8 @@ class Game:
         Returns:
             None
         """
-        self._stop_current_activity(character_name, session)
+        character = self._get_character_by_name(character_name, session)
+        self._stop_current_activity(character, session)
 
     @with_session
     def get_all_characters(self, session: sqlalchemy.orm.Session) -> list[CharacterData]:

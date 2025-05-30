@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
@@ -65,9 +66,9 @@ class ActivityOption(TimestampMixin, Base):
         activity_option_name (str): Unique name of the option (e.g., "iron_ore")
         activity_id (int): Foreign key to parent Activity
         action_time (int): Time in seconds required to complete this action
-        reward_item_id (int): Foreign key to the Item rewarded
-        reward_experience (int): Experience points awarded for completion
-        skill_requirements (dict[str, int]): Required skill levels to perform action
+        skill_requirements (list[ActivityOptionSkillRequirement]): Required skill levels to perform action
+        item_costs: (list[ActivityOptionItemCost])
+
 
     Relationships:
         activity: Many-to-one relationship to Activity
@@ -80,13 +81,30 @@ class ActivityOption(TimestampMixin, Base):
     activity_option_name: Mapped[str] = mapped_column(unique=True)
     activity_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
     action_time: Mapped[int]
-    reward_item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
-    reward_experience: Mapped[int]
 
     activity = relationship("Activity", back_populates="options")
     skill_requirements: Mapped[list["ActivityOptionSkillRequirement"]] = relationship("ActivityOptionSkillRequirement")
-    item_costs: Mapped[list["ActivityOptionItemCosts"]] = relationship("ActivityOptionItemCosts")
-    reward_item = relationship("Item")
+    item_costs: Mapped[list["ActivityOptionItemCost"]] = relationship("ActivityOptionItemCost")
+    reward_items: Mapped[list["ActivityOptionItemReward"]] = relationship("ActivityOptionItemReward")
+    reward_experience: Mapped[list["ActivityOptionExperienceReward"]] = relationship("ActivityOptionExperienceReward")
+
+
+class ActivityOptionItemReward(TimestampMixin, Base):
+    __tablename__ = "activity_option_item_rewards"
+
+    activity_option_item_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity > 0"))
+
+
+class ActivityOptionExperienceReward(TimestampMixin, Base):
+    __tablename__ = "activity_option_experience_rewards"
+
+    activity_option_experience_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
+    skill_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
+    experience: Mapped[int] = mapped_column(CheckConstraint("experience > 0"))
 
 
 class ActivityOptionSkillRequirement(TimestampMixin, Base):
@@ -100,13 +118,13 @@ class ActivityOptionSkillRequirement(TimestampMixin, Base):
     )
 
 
-class ActivityOptionItemCosts(TimestampMixin, Base):
-    __tablename__ = "activity_option_item_costs"
+class ActivityOptionItemCost(TimestampMixin, Base):
+    __tablename__ = "activity_option_item_cost"
 
     activity_option_item_cost_id: Mapped[int] = mapped_column(primary_key=True)
     activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
     item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
-    quantity_cost: Mapped[int] = mapped_column(CheckConstraint("quantity_cost > 0"))
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity > 0"))
 
 
 class Item(TimestampMixin, Base):
@@ -283,3 +301,57 @@ def ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
     if dt.tzinfo is None:
         return pendulum.instance(dt, tz="UTC")
     return dt
+
+
+class CharacterActivityHistory(TimestampMixin, Base):
+    __tablename__ = "character_activity_history"
+
+    character_activity_history_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_id: Mapped[int] = mapped_column(ForeignKey("characters.character_id"))
+    activity_option_id: Mapped[int] = mapped_column(ForeignKey("activity_options.activity_option_id"))
+    started_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
+
+    item_rewards: Mapped[list["CharacterActivityItemReward"]] = relationship(
+        "CharacterActivityItemReward", uselist=True
+    )
+    experience_rewards: Mapped[list["CharacterActivityExperienceReward"]] = relationship(
+        "CharacterActivityExperienceReward", uselist=True
+    )
+    item_costs: Mapped[list["CharacterActivityItemCost"]] = relationship("CharacterActivityItemCost", uselist=True)
+    experience_rewards: Mapped[list["CharacterActivityExperienceReward"]] = relationship(
+        "CharacterActivityExperienceReward", uselist=True
+    )
+
+
+class CharacterActivityItemReward(TimestampMixin, Base):
+    __tablename__ = "character_activity_item_reward"
+
+    character_activity_item_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_activity_history_id: Mapped[int] = mapped_column(
+        ForeignKey("character_activity_history.character_activity_history_id")
+    )
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity > 0"))
+
+
+class CharacterActivityExperienceReward(TimestampMixin, Base):
+    __tablename__ = "character_activity_experience_reward"
+
+    character_activity_experience_reward_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_activity_history_id: Mapped[int] = mapped_column(
+        ForeignKey("character_activity_history.character_activity_history_id")
+    )
+    skill_id: Mapped[int] = mapped_column(ForeignKey("activities.activity_id"))
+    experience: Mapped[int] = mapped_column(CheckConstraint("experience > 0"))
+
+
+class CharacterActivityItemCost(TimestampMixin, Base):
+    __tablename__ = "character_activity_item_costs"
+
+    character_activity_item_cost_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    character_activity_history_id: Mapped[int] = mapped_column(
+        ForeignKey("character_activity_history.character_activity_history_id")
+    )
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.item_id"))
+    quantity: Mapped[int] = mapped_column(CheckConstraint("quantity > 0"))

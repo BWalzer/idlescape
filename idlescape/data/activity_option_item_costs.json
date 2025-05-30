@@ -3,12 +3,12 @@
         "activity_option_item_cost_id": 1,
         "activity_option_id": 7,
         "item_id": 5,
-        "quantity_cost": 1
+        "quantity": 1
     },
     {
         "activity_option_item_cost_id": 2,
         "activity_option_id": 7,
         "item_id": 6,
-        "quantity_cost": 1
+        "quantity": 1
     }
 ]
