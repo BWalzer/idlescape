@@ -1,4 +1,4 @@
-name: CI
+name: continuous-integration
 
 on:
   pull_request:
@@ -8,8 +8,8 @@ on:
     branches: [main]
 
 jobs:
-  uv-example:
-    name: python
+  continuous-integration:
+    name: continuous-integration
     runs-on: ubuntu-latest
 
     steps:
