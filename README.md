@@ -14,7 +14,10 @@ In _rough_ order of when they'll be added.
         - [ ] quests (after quests)
     - [x] Costs: Items (crafting skills)
 - [ ] Activity history
-    - [ ] Character activity rewards (xp, items)
+    - [x] Rewarded items
+    - [x] Rewarded XP
+    - [x] Item Costs
+    - [ ] Make it pretty
 - [ ] Combat
     - [ ] Equipment
     - [ ] Skills
@@ -27,7 +30,6 @@ In _rough_ order of when they'll be added.
 - [ ] Skill improvements
     - [ ] Tools boost action rate
     - [ ] Levels boost action rate
-    - [ ]
 
 ## Interface
 - [ ] Add name rules

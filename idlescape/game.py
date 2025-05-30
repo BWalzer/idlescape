@@ -14,6 +14,7 @@ from idlescape.character import (
     CharacterActivityExperienceReward,
     CharacterActivityHistory,
     CharacterActivityItemCost,
+    CharacterActivityItemReward,
     CharacterSkill,
     ensure_utc,
 )
@@ -434,6 +435,13 @@ class Game:
         # Reward items
         # For each item, give it to the character.
         for reward_item in activity_option.reward_items:
+            character_activity_history.item_rewards.append(
+                CharacterActivityItemReward(
+                    character_activity_history_id=character_activity_history.character_activity_history_id,
+                    item_id=reward_item.item_id,
+                    quantity=reward_item.quantity,
+                )
+            )
             character_item = self._get_character_item(character.character_id, reward_item.item_id, session)
             character_item.quantity += reward_item.quantity * actions_completed
 

@@ -501,9 +501,11 @@ class CharacterActivityItemCostData(TimestampMixinDTO):
     def from_orm(cls, character_activity_item_cost: CharacterActivityItemCost) -> "CharacterActivityItemCostData":
         return cls(
             character_activity_item_cost_id=character_activity_item_cost.character_activity_item_cost_id,
-            character_activity_history_id=character_activity_item_cost.characte_activity_history_id,
+            character_activity_history_id=character_activity_item_cost.character_activity_history_id,
             item_id=character_activity_item_cost.item_id,
             quantity=character_activity_item_cost.quantity,
+            created_at=character_activity_item_cost.created_at,
+            updated_at=character_activity_item_cost.updated_at,
         )
 
 
