@@ -5,8 +5,9 @@ on:
     inputs:
       bump_type:
         description: "Type of version bump (patch, minor, major)"
+        type: choice
+        options: [patch, major, minor]
         required: true
-        default: "patch"
 
 jobs:
   Build:
@@ -47,12 +48,8 @@ jobs:
         with:
           name: build
 
-      # TODO: Setup PyPI
-      # - name: Publish to PyPI
-      #   run: uv publish
-      #   env:
-      #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Publish to PyPI
+        run: uv publish
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
