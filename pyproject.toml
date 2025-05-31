@@ -15,6 +15,9 @@ dependencies = [
     "sqlalchemy>=2.0.41",
 ]
 
+[project.urls]
+Homepage = "https://github.com/BWalzer/idlescape"
+
 [tool.ruff]
 line-length = 120
 
