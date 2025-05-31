@@ -1,8 +1,6 @@
 name: continuous-deployment
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       bump_type:
@@ -11,7 +9,7 @@ on:
         default: "patch"
 
 jobs:
-  Setup:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -27,21 +25,6 @@ jobs:
 
       - name: Install Dependencies
         run: uv sync --locked --all-extras --dev
-
-  Build:
-    needs: Setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: "pyproject.toml"
 
       - name: Version Bump
         run: uv version --bump ${{ github.event.inputs.bump_type }}
