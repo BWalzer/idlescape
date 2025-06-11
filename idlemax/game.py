@@ -7,7 +7,7 @@ import pendulum
 import sqlalchemy
 import sqlalchemy.orm
 
-from idlescape.character import (
+from idlemax.character import (
     Activity,
     Base,
     Character,
@@ -19,7 +19,7 @@ from idlescape.character import (
     CharacterSkill,
     ensure_utc,
 )
-from idlescape.game_data import (
+from idlemax.game_data import (
     ActivityData,
     ActivityOption,
     ActivityOptionData,
@@ -57,11 +57,11 @@ def with_session(func):
 
 class Game:
     """
-    Main game logic class for Idlescape.
+    Main game logic class for Idlemax.
     Handles character creation, activities, skills, items, and database management.
     """
 
-    def __init__(self, db_filepath: str = "sqlite:///idlescape.db"):
+    def __init__(self, db_filepath: str = "sqlite:///idlemax.db"):
         """
         Initialize the Game instance and create/load the database schema and static data.
         Args:
@@ -80,52 +80,52 @@ class Game:
             session.commit()
 
     def _load_item_rewards(self, session: sqlalchemy.orm.Session) -> None:
-        from idlescape.character import ActivityOptionItemReward
+        from idlemax.character import ActivityOptionItemReward
 
         session.query(ActivityOptionItemReward).delete()
-        with importlib.resources.open_text("idlescape.data", "activity_option_item_rewards.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activity_option_item_rewards.json") as f:
             item_rewards: list[dict[str, int]] = json.load(f)
         session.add_all([ActivityOptionItemReward(**item_reward) for item_reward in item_rewards])
 
     def _load_experience_rewards(self, session: sqlalchemy.orm.Session) -> None:
-        from idlescape.character import ActivityOptionExperienceReward
+        from idlemax.character import ActivityOptionExperienceReward
 
         session.query(ActivityOptionExperienceReward).delete()
-        with importlib.resources.open_text("idlescape.data", "activity_option_experience_rewards.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activity_option_experience_rewards.json") as f:
             xp_rewards: list[dict[str, int]] = json.load(f)
         session.add_all([ActivityOptionExperienceReward(**xp_reward) for xp_reward in xp_rewards])
 
     def _load_skill_requirements(self, session: sqlalchemy.orm.Session) -> None:
-        from idlescape.game_data import ActivityOptionSkillRequirement
+        from idlemax.game_data import ActivityOptionSkillRequirement
 
         session.query(ActivityOptionSkillRequirement).delete()
-        with importlib.resources.open_text("idlescape.data", "activity_option_skill_requirements.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activity_option_skill_requirements.json") as f:
             skill_requirements: list[dict] = json.load(f)
         session.add_all([ActivityOptionSkillRequirement(**requirement) for requirement in skill_requirements])
 
     def _load_item_costs(self, session: sqlalchemy.orm.Session) -> None:
-        from idlescape.game_data import ActivityOptionItemCost
+        from idlemax.game_data import ActivityOptionItemCost
 
         session.query(ActivityOptionItemCost).delete()
-        with importlib.resources.open_text("idlescape.data", "activity_option_item_costs.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activity_option_item_costs.json") as f:
             item_costs: list[dict] = json.load(f)
         session.add_all([ActivityOptionItemCost(**cost) for cost in item_costs])
 
     def _load_activity_options(self, session: sqlalchemy.orm.Session) -> None:
         session.query(ActivityOption).delete()
-        with importlib.resources.open_text("idlescape.data", "activity_options.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activity_options.json") as f:
             activity_options: list[dict] = json.load(f)
         session.add_all([ActivityOption(**activity_option) for activity_option in activity_options])
 
     def _load_items(self, session: sqlalchemy.orm.Session) -> None:
         session.query(Item).delete()
-        with importlib.resources.open_text("idlescape.data", "items.json") as f:
+        with importlib.resources.open_text("idlemax.data", "items.json") as f:
             items: list[dict] = json.load(f)
         session.add_all([Item(**item) for item in items])
 
     def _load_activities(self, session: sqlalchemy.orm.Session) -> None:
         session.query(Activity).delete()
-        with importlib.resources.open_text("idlescape.data", "activities.json") as f:
+        with importlib.resources.open_text("idlemax.data", "activities.json") as f:
             activities: list[dict] = json.load(f)
         session.add_all([Activity(**activity) for activity in activities])
 

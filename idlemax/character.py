@@ -6,7 +6,7 @@ import pendulum
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, sql
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from idlescape.experience_to_level import xp_to_level
+from idlemax.experience_to_level import xp_to_level
 
 
 class TimestampMixin:

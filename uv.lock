@@ -85,7 +85,7 @@ wheels = [
 ]
 
 [[package]]
-name = "idlescape"
+name = "idlemax"
 version = "0.3.0"
 source = { editable = "." }
 dependencies = [

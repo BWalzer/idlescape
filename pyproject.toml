@@ -1,5 +1,5 @@
 [project]
-name = "idlescape"
+name = "idlemax"
 version = "0.3.0"
 description = "An idle game. Collect resources, level up skills."
 readme = "README.md"
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/BWalzer/idlescape"
+Homepage = "https://github.com/BWalzer/idlemax"
 
 [tool.ruff]
 line-length = 120
@@ -38,4 +38,4 @@ dev = ["pre-commit>=4.2.0", "pytest>=8.3.5", "uv>=0.7.8"]
 webapp = []
 
 [project.scripts]
-idlescape = "idlescape.cli:cli"
+idlemax = "idlemax.cli:cli"
