@@ -1,4 +1,4 @@
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BWalzer/idlescape/main.svg)](https://results.pre-commit.ci/latest/github/BWalzer/idlescape/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BWalzer/idlemax/main.svg)](https://results.pre-commit.ci/latest/github/BWalzer/idlemax/main)
 
 # TODO
 ## Game Features

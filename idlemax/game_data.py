@@ -4,7 +4,7 @@ from typing import Optional
 import pendulum
 import sqlalchemy.orm
 
-from idlescape.character import (
+from idlemax.character import (
     Activity,
     ActivityOption,
     ActivityOptionItemCost,
@@ -20,7 +20,7 @@ from idlescape.character import (
     Item,
     ensure_utc,
 )
-from idlescape.experience_to_level import xp_to_level
+from idlemax.experience_to_level import xp_to_level
 
 
 @dataclass

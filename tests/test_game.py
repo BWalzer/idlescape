@@ -3,7 +3,7 @@ import os
 import pytest
 import sqlalchemy
 
-from idlescape.game import Game
+from idlemax.game import Game
 
 TEST_DB_PATH = "test-game.db"
 

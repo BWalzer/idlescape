@@ -2,9 +2,9 @@ import click
 import questionary
 from questionary import Style
 
-from idlescape.game import Game
+from idlemax.game import Game
 
-DEFAULT_DB_PATH = "sqlite:///idlescape.db"
+DEFAULT_DB_PATH = "sqlite:///idlemax.db"
 
 # Define a custom style for questionary with highlighted selection and surrounding text
 custom_style = Style(

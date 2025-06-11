@@ -3,7 +3,7 @@
 # import pytest
 # from click.testing import CliRunner
 
-# from idlescape.cli import cli
+# from idlemax.cli import cli
 
 # TEST_DB_PATH = "test-cli.db"
 
